@@ -1,0 +1,142 @@
+$main_purple: rgba(99, 95, 199, 1);
+$main_purple25: rgba(99, 95, 199, 0.25);
+$main_purple_hover: rgba(168, 164, 255, 1);
+$main_purple_light: rgba(99, 95, 199, 0.1);
+$main_purple_light_hover: rgba(99, 95, 199, 0.25);
+$red: rgba(234, 85, 85, 1);
+$red_hover: rgba(255, 152, 152, 1);
+
+body #root,
+.fade.modal {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  h1 {
+    // Heading XL
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 30px;
+  }
+
+  h2 {
+    // Heading L
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 23px;
+    margin-bottom: 0px;
+  }
+
+  h3 {
+    // Heading M
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 19px;
+  }
+
+  h4 {
+    // Heading S
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    letter-spacing: 2.4px;
+  }
+
+  p {
+    // Body L
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 23px;
+  }
+
+  p.bold {
+    // Body M
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+  }
+
+  button {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 700;
+    width: fit-content;
+
+    &.large {
+      padding: 15px 18px;
+      border-radius: 24px;
+      border: 0px;
+
+      font-size: 15px;
+      line-height: 19px;
+      text-align: center;
+
+      &.prim {
+        background-color: $main_purple;
+        color: #ffffff;
+
+        &:hover {
+          background-color: $main_purple_hover;
+          cursor: url('./images/pointer.png'), pointer;
+        }
+
+        &.inactive {
+          background-color: $main_purple25;
+        }
+      }
+    }
+
+    &.small {
+      padding: 8px 69px;
+      border-radius: 20px;
+      border: 0px;
+
+      font-size: 13px;
+      line-height: 23px;
+      text-align: center;
+
+      &.prim {
+        background-color: $main_purple;
+        color: #ffffff;
+
+        &:hover {
+          background-color: $main_purple_hover;
+          cursor: url('./images/pointer.png'), pointer;
+        }
+      }
+
+      &.second {
+        background-color: $main_purple_light;
+        color: $main_purple;
+
+        &:hover {
+          background-color: $main_purple_light_hover;
+          cursor: url('./images/pointer.png'), pointer;
+        }
+      }
+
+      &.destruct {
+        background-color: $red;
+        color: white;
+
+        &:hover {
+          background-color: $red_hover;
+          cursor: url('./images/pointer.png'), pointer;
+        }
+      }
+    }
+
+    &.task {
+      width: 280px;
+    }
+  }
+}
+
+body .fade.modal {
+  --bs-modal-header-padding: 2rem 2rem 12px 2rem;
+  --bs-modal-padding: 12px 2rem 2rem;
+  --bs-modal-header-border-width: 0px;
+
+  --bs-modal-width: 480px;
+}

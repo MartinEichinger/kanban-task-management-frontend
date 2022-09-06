@@ -1,0 +1,127 @@
+body #root,
+.fade.modal {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+body #root h1,
+.fade.modal h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 30px;
+}
+body #root h2,
+.fade.modal h2 {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 23px;
+  margin-bottom: 0px;
+}
+body #root h3,
+.fade.modal h3 {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 19px;
+}
+body #root h4,
+.fade.modal h4 {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 2.4px;
+}
+body #root p,
+.fade.modal p {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 23px;
+}
+body #root p.bold,
+.fade.modal p.bold {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 15px;
+}
+body #root button,
+.fade.modal button {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+body #root button.large,
+.fade.modal button.large {
+  padding: 15px 18px;
+  border-radius: 24px;
+  border: 0px;
+  font-size: 15px;
+  line-height: 19px;
+  text-align: center;
+}
+body #root button.large.prim,
+.fade.modal button.large.prim {
+  background-color: rgb(99, 95, 199);
+  color: #ffffff;
+}
+body #root button.large.prim:hover,
+.fade.modal button.large.prim:hover {
+  background-color: rgb(168, 164, 255);
+  cursor: url("./images/pointer.png"), pointer;
+}
+body #root button.large.prim.inactive,
+.fade.modal button.large.prim.inactive {
+  background-color: rgba(99, 95, 199, 0.25);
+}
+body #root button.small,
+.fade.modal button.small {
+  padding: 8px 69px;
+  border-radius: 20px;
+  border: 0px;
+  font-size: 13px;
+  line-height: 23px;
+  text-align: center;
+}
+body #root button.small.prim,
+.fade.modal button.small.prim {
+  background-color: rgb(99, 95, 199);
+  color: #ffffff;
+}
+body #root button.small.prim:hover,
+.fade.modal button.small.prim:hover {
+  background-color: rgb(168, 164, 255);
+  cursor: url("./images/pointer.png"), pointer;
+}
+body #root button.small.second,
+.fade.modal button.small.second {
+  background-color: rgba(99, 95, 199, 0.1);
+  color: rgb(99, 95, 199);
+}
+body #root button.small.second:hover,
+.fade.modal button.small.second:hover {
+  background-color: rgba(99, 95, 199, 0.25);
+  cursor: url("./images/pointer.png"), pointer;
+}
+body #root button.small.destruct,
+.fade.modal button.small.destruct {
+  background-color: rgb(234, 85, 85);
+  color: white;
+}
+body #root button.small.destruct:hover,
+.fade.modal button.small.destruct:hover {
+  background-color: rgb(255, 152, 152);
+  cursor: url("./images/pointer.png"), pointer;
+}
+body #root button.task,
+.fade.modal button.task {
+  width: 280px;
+}
+
+body .fade.modal {
+  --bs-modal-header-padding: 2rem 2rem 12px 2rem;
+  --bs-modal-padding: 12px 2rem 2rem;
+  --bs-modal-header-border-width: 0px;
+  --bs-modal-width: 480px;
+}/*# sourceMappingURL=index.css.map */
