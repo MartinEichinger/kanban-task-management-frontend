@@ -2,9 +2,13 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import styled from '@emotion/styled';
 import { ReactComponent as Logo } from './images/logo-dark.svg';
+import { ReactComponent as LogoMobile } from './images/logo-mobile.svg';
 import { ReactComponent as SidebarIcon } from './images/icon-board.svg';
 import { ReactComponent as HideIcon } from './images/icon-hide-sidebar.svg';
 import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
+import { ReactComponent as ArrowDown } from './images/icon-chevron-down.svg';
+import { ReactComponent as ArrowUp } from './images/icon-chevron-up.svg';
+
 import pointer from './images/pointer.png';
 import TaskModal from './TaskModal';
 import NewTaskModal from './NewTaskModal';
@@ -52,6 +56,7 @@ function App() {
   const [newBoardModalShow, setNewBoardModalShow] = useState(false);
   const [deleteModalShow, setDeleteModalShow] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [mobilChevronDown, setMobilChevronDown] = useState(true);
 
   const [data, setData] = useState<TDataProp>({} as TDataProp);
   const [deleteTarget, setDeleteTarget] = useState('');
@@ -195,6 +200,7 @@ function App() {
     } else if (operation === 'delete-board') {
       obj.boards.splice(selectedBoard, 1);
       setDeleteModalShow(false);
+      ResetData();
     }
   };
 
@@ -341,17 +347,34 @@ function App() {
     <div className="App">
       <div className="frame d-flex flex-column">
         <Nav className="nav d-flex flex-row" colors={colors} pointer={pointer}>
-          <div className="logo" onClick={ResetData}>
+          <div className="d-none d-sm-block logo" onClick={ResetData}>
             <Logo />
           </div>
-          <div className="navbar d-flex">
-            <h1 className="mr-auto">{selectedBoard > -1 ? data.boards?.[selectedBoard]?.name : ''}</h1>
+          <div className="navbar d-flex flex-row justify-content-around">
+            <LogoMobile className="d-flex d-sm-none mr-3 pointer" onClick={ResetData} />
+            <h1 className="mr-sm-auto mr-2">
+              {selectedBoard > -1 ? data.boards?.[selectedBoard]?.name : '...board'}
+            </h1>
+            <ArrowDown
+              className={mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
+              onClick={() => {
+                setMobilChevronDown(!mobilChevronDown);
+                setSidebarCollapse(false);
+              }}
+            />
+            <ArrowUp
+              className={!mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
+              onClick={() => {
+                setMobilChevronDown(!mobilChevronDown);
+                setSidebarCollapse(true);
+              }}
+            />
             <button
               className="btn large prim"
               disabled={selectedBoard === -1}
               onClick={() => setNewTaskModalShow(true)}
             >
-              + Add New Task
+              +<span className="d-none d-sm-inline"> Add New Task</span>
             </button>
             <EllipsisBody
               className={selectedBoard > -1 ? '' : 'disabled'}
@@ -410,7 +433,7 @@ function App() {
                 <h3>+ Create New Board</h3>
               </div>
             </div>
-            <div className="lower d-flex flex-column">
+            <div className="lower d-none d-sm-flex flex-column">
               <div
                 className={
                   sidebarCollapse
@@ -679,6 +702,14 @@ const Nav = styled.div<TColorProp & TPointerProp>`
     border-bottom: 1px solid ${({ colors }) => colors.lines_light};
     border-top: 0px;
     width: calc(100vw - 305px);
+
+    @media (max-width: 575px) {
+      width: 100vw;
+    }
+  }
+
+  .pointer {
+    cursor: url('${({ pointer }) => pointer}'), pointer;
   }
 `;
 

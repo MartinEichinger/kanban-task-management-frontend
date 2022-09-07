@@ -10,6 +10,14 @@ body #root h1,
   font-size: 24px;
   font-weight: 700;
   line-height: 30px;
+  margin-bottom: 0px;
+}
+@media (max-width: 575px) {
+  body #root h1,
+.fade.modal h1 {
+    font-size: 18px;
+    line-height: 23px;
+  }
 }
 body #root h2,
 .fade.modal h2 {
@@ -60,6 +68,14 @@ body #root button.large,
   font-size: 15px;
   line-height: 19px;
   text-align: center;
+}
+@media (max-width: 575px) {
+  body #root button.large,
+.fade.modal button.large {
+    padding: 10px 18px;
+    font-size: 12px;
+    line-height: 12px;
+  }
 }
 body #root button.large.prim,
 .fade.modal button.large.prim {

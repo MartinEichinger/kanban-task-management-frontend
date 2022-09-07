@@ -18,6 +18,12 @@ body #root,
     font-size: 24px;
     font-weight: 700;
     line-height: 30px;
+    margin-bottom: 0px;
+
+    @media (max-width: 575px) {
+      font-size: 18px;
+      line-height: 23px;
+    }
   }
 
   h2 {
@@ -71,6 +77,12 @@ body #root,
       font-size: 15px;
       line-height: 19px;
       text-align: center;
+
+      @media (max-width: 575px) {
+        padding: 10px 18px;
+        font-size: 12px;
+        line-height: 12px;
+      }
 
       &.prim {
         background-color: $main_purple;
