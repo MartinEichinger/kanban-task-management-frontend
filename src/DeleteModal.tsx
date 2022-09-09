@@ -49,9 +49,9 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
           Are you sure you want to delete the ‘{props.title}’ {props.target} and its{' '}
           {props.target === 'task' ? 'sub' : ''}tasks? This action cannot be reversed.
         </p>
-        <div className="d-flex flex-row justify-content-start">
+        <div className="d-flex flex-column flex-sm-row justify-content-start">
           <button
-            className="btn small destruct mr-2"
+            className="btn small destruct mr-2 mb-2 w-100"
             onClick={() => {
               if (props.target === 'board') {
                 props.onDelete('delete-board', selectedBoard);
@@ -62,7 +62,7 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
           >
             Delete
           </button>
-          <button className="btn small second" onClick={props.onHide}>
+          <button className="btn small second w-100" onClick={props.onHide}>
             Cancel
           </button>
         </div>

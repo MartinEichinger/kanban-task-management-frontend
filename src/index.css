@@ -128,10 +128,16 @@ body #root button.task,
 }
 
 body .fade.modal {
-  --bs-modal-header-padding: 2rem 2rem 12px 2rem;
-  --bs-modal-padding: 12px 2rem 2rem;
+  --bs-modal-header-padding: 32px 32px 12px 32px;
+  --bs-modal-padding: 12px 32px 32px;
   --bs-modal-header-border-width: 0px;
   --bs-modal-width: 480px;
+}
+@media (max-width: 575px) {
+  body .fade.modal {
+    --bs-modal-header-padding: 24px 24px 12px 24px;
+    --bs-modal-padding: 12px 24px 24px;
+  }
 }
 
 @media (max-width: 575px) {

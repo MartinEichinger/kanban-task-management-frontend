@@ -328,7 +328,7 @@ function App() {
                 <span className={'circle c' + i}></span>
                 {item.name} ({item.tasks.length})
               </h4>
-              <div>
+              <div className="col-body">
                 {item.tasks.map((task, j) => {
                   var completed = task.subtasks.filter((subtask) => {
                     return subtask.isCompleted === true;
@@ -595,11 +595,16 @@ const EllipsisBody = styled.div<TNavProp>`
 `;
 const Columns = styled.div<TNavProp>`
   margin: 12px;
+  height: inherit;
 
   .column {
     margin: 12px;
     width: 280px;
-    height: calc(100vh - 200px);
+    height: calc(100% - 15px); //calc(100vh - 200px);
+
+    .col-body {
+      overflow-x: hidden;
+    }
 
     &.add-col {
       border-radius: 6px;
@@ -726,6 +731,10 @@ const Nav = styled.div<TColorProp & TPointerProp>`
 
 const Main = styled.div`
   height: calc(100vh - 116px);
+
+  @media (max-width: 575px) {
+    height: calc(100vh - 67px);
+  }
 `;
 
 const Content = styled.div<TNavProp>`
@@ -736,6 +745,7 @@ const Content = styled.div<TNavProp>`
 
   @media (max-width: 575px) {
     width: 100vw;
+    height: calc(100vh - 67px);
 
     h2 {
       margin: 0px 16px;
