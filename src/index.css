@@ -136,6 +136,6 @@ body .fade.modal {
 
 @media (max-width: 575px) {
   body .fade.modal-backdrop {
-    top: 99px;
+    top: 65px;
   }
 }/*# sourceMappingURL=index.css.map */

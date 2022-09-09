@@ -1,18 +1,8 @@
 import * as React from 'react';
-import { useState } from 'react';
 import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
 import Sidebar from './Sidebar';
-import Checkbox from './Checkbox';
-import Dropdown from './Dropdown';
-import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import pointer from './images/pointer.png';
-
-interface TSelectionProp {
-  selectedBoard: number;
-  selectedCol: number;
-  selectedTask: number;
-}
 
 interface TModalProp {
   show: any;
@@ -84,7 +74,7 @@ const SidebarMenuModalMain = styled(Modal)<TNavProp & TPointerProp>`
 
   .modal-content {
     position: absolute;
-    top: 120px;
+    top: 100px;
   }
 
   .modal-body {

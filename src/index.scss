@@ -78,12 +78,6 @@ body #root,
       line-height: 19px;
       text-align: center;
 
-      @media (max-width: 575px) {
-        //padding: 10px 18px;
-        //font-size: 12px;
-        //line-height: 12px;
-      }
-
       &.prim {
         background-color: $main_purple;
         color: #ffffff;
@@ -155,6 +149,6 @@ body .fade.modal {
 
 body .fade.modal-backdrop {
   @media (max-width: 575px) {
-    top: 99px;
+    top: 65px;
   }
 }

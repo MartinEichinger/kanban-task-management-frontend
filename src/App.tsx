@@ -6,6 +6,7 @@ import { ReactComponent as LogoMobile } from './images/logo-mobile.svg';
 import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import { ReactComponent as ArrowDown } from './images/icon-chevron-down.svg';
 import { ReactComponent as ArrowUp } from './images/icon-chevron-up.svg';
+import { ReactComponent as Cross } from './images/icon-add-task-mobile.svg';
 
 import pointer from './images/pointer.png';
 import TaskModal from './TaskModal';
@@ -393,10 +394,12 @@ function App() {
             />
             <button
               className="btn large prim"
+              id="add-task"
               disabled={selectedBoard === -1}
               onClick={() => setNewTaskModalShow(true)}
             >
-              +<span className="d-none d-sm-inline"> Add New Task</span>
+              {width !== undefined && width < 576 && <Cross />}
+              <span className="d-none d-sm-inline">+ Add New Task</span>
             </button>
             <EllipsisBody
               className={selectedBoard > -1 ? '' : 'disabled'}
@@ -430,7 +433,7 @@ function App() {
 
           <Content colors={colors} pointer={pointer} className={sidebarCollapse ? 'collapsed' : ''}>
             {selectedBoard > -1 ? (
-              <div className="content d-flex flex-column justify-content-center align-items-start">
+              <div className="content d-flex flex-column justify-content-start align-items-start">
                 <RenderContent />
               </div>
             ) : (
@@ -707,7 +710,12 @@ const Nav = styled.div<TColorProp & TPointerProp>`
 
     @media (max-width: 575px) {
       width: 100vw;
-      padding: 20px 3px 19px 16px;
+      padding: 16px 3px 16px 16px;
+    }
+
+    #add-task {
+      padding: 10px 18px;
+      line-height: 12px;
     }
   }
 
