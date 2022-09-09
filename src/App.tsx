@@ -53,8 +53,8 @@ function App() {
 
   const winRef = useRef<HTMLDivElement>(null);
 
-  const [width, setWidth] = useState();
-  const [height, setHeight] = useState();
+  const [width, setWidth] = useState(winRef.current?.clientWidth);
+  const [height, setHeight] = useState(winRef.current?.clientHeight);
   const [taskModalShow, setTaskModalShow] = useState(false);
   const [newTaskModalShow, setNewTaskModalShow] = useState(false);
   const [newBoardModalShow, setNewBoardModalShow] = useState(false);
@@ -109,7 +109,11 @@ function App() {
     setSelectedCol(-1);
     setSelectedTask(-1);
     setEditedTask(-1);
-    setSidebarCollapse(false);
+    if (width !== undefined && width < 576) {
+      setSidebarCollapse(true);
+    } else {
+      setSidebarCollapse(false);
+    }
   };
 
   const onClickMenu = (sel: string) => {
@@ -703,6 +707,7 @@ const Nav = styled.div<TColorProp & TPointerProp>`
 
     @media (max-width: 575px) {
       width: 100vw;
+      padding: 20px 3px 19px 16px;
     }
   }
 
@@ -723,6 +728,10 @@ const Content = styled.div<TNavProp>`
 
   @media (max-width: 575px) {
     width: 100vw;
+
+    h2 {
+      margin: 0px 16px;
+    }
   }
 
   &.collapsed {
