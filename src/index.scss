@@ -152,3 +152,9 @@ body .fade.modal {
 
   --bs-modal-width: 480px;
 }
+
+body .fade.modal-backdrop {
+  @media (max-width: 575px) {
+    top: 99px;
+  }
+}

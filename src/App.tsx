@@ -1,10 +1,8 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 import { ReactComponent as Logo } from './images/logo-dark.svg';
 import { ReactComponent as LogoMobile } from './images/logo-mobile.svg';
-import { ReactComponent as SidebarIcon } from './images/icon-board.svg';
-import { ReactComponent as HideIcon } from './images/icon-hide-sidebar.svg';
 import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import { ReactComponent as ArrowDown } from './images/icon-chevron-down.svg';
 import { ReactComponent as ArrowUp } from './images/icon-chevron-up.svg';
@@ -14,6 +12,8 @@ import TaskModal from './TaskModal';
 import NewTaskModal from './NewTaskModal';
 import NewBoardModal from './NewBoardModal';
 import DeleteModal from './DeleteModal';
+import SidebarMenuModal from './SidebarMenuModal';
+import Sidebar from './Sidebar';
 
 const colors = {
   lines_light: 'rgba(228,235,250,1)',
@@ -51,10 +51,16 @@ function App() {
     }[];
   };
 
+  const winRef = useRef<HTMLDivElement>(null);
+
+  const [width, setWidth] = useState();
+  const [height, setHeight] = useState();
   const [taskModalShow, setTaskModalShow] = useState(false);
   const [newTaskModalShow, setNewTaskModalShow] = useState(false);
   const [newBoardModalShow, setNewBoardModalShow] = useState(false);
   const [deleteModalShow, setDeleteModalShow] = useState(false);
+  const [showSidebarMenu, setShowSidebarMenu] = useState(false);
+
   const [showMenu, setShowMenu] = useState(false);
   const [mobilChevronDown, setMobilChevronDown] = useState(true);
 
@@ -77,7 +83,19 @@ function App() {
         console.log('App/useEffect: ', json);
         setData(json);
       });
+    getWinSize();
+    window.addEventListener('resize', getWinSize);
   }, []);
+
+  const getWinSize = () => {
+    const newWidth: any = winRef.current?.clientWidth;
+    setWidth(newWidth);
+
+    const newHeight: any = winRef.current?.clientHeight;
+    setHeight(newHeight);
+
+    newWidth < 576 ? setSidebarCollapse(true) : setSidebarCollapse(false);
+  };
 
   const ResetData = () => {
     setTaskModalShow(false);
@@ -344,7 +362,7 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="App" ref={winRef}>
       <div className="frame d-flex flex-column">
         <Nav className="nav d-flex flex-row" colors={colors} pointer={pointer}>
           <div className="d-none d-sm-block logo" onClick={ResetData}>
@@ -359,14 +377,14 @@ function App() {
               className={mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
               onClick={() => {
                 setMobilChevronDown(!mobilChevronDown);
-                setSidebarCollapse(false);
+                setShowSidebarMenu(true);
               }}
             />
             <ArrowUp
               className={!mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
               onClick={() => {
                 setMobilChevronDown(!mobilChevronDown);
-                setSidebarCollapse(true);
+                setShowSidebarMenu(false);
               }}
             />
             <button
@@ -396,57 +414,15 @@ function App() {
         </Nav>
         <Main className="main  d-flex flex-row">
           <Sidebar
-            className={
-              sidebarCollapse
-                ? 'sidebar collapsed d-flex flex-column justify-content-between'
-                : 'sidebar d-flex flex-column justify-content-between'
-            }
             colors={colors}
-            pointer={pointer}
-          >
-            <div className="upper d-flex flex-column">
-              <h3 className="sidebar-heading">ALL BOARDS ({data.boards?.length})</h3>
-              {data.boards?.map((item, i) => {
-                return (
-                  <div
-                    className={
-                      selectedBoard === i
-                        ? 'nav-item d-flex flex-row align-items-center active'
-                        : 'nav-item d-flex flex-row align-items-center'
-                    }
-                    onClick={() => selectBoard(i)}
-                    key={i}
-                  >
-                    <SidebarIcon />
-                    <h3>{item.name}</h3>
-                  </div>
-                );
-              })}
-              <div
-                className="nav-item-plus d-flex flex-row align-items-center"
-                onClick={() => {
-                  setEditedBoard(-1);
-                  setNewBoardModalShow(true);
-                }}
-              >
-                <SidebarIcon />
-                <h3>+ Create New Board</h3>
-              </div>
-            </div>
-            <div className="lower d-none d-sm-flex flex-column">
-              <div
-                className={
-                  sidebarCollapse
-                    ? 'nav-item marker collapsed d-flex flex-row align-items-center'
-                    : 'nav-item marker d-flex flex-row align-items-center'
-                }
-                onClick={ToggleSidebarCollapse}
-              >
-                <HideIcon />
-                {!sidebarCollapse && <h3>HideSidebar</h3>}
-              </div>
-            </div>
-          </Sidebar>
+            sidebarCollapse={sidebarCollapse}
+            data={data}
+            selectedBoard={selectedBoard}
+            selectBoard={selectBoard}
+            setEditedBoard={setEditedBoard}
+            setNewBoardModalShow={setNewBoardModalShow}
+            ToggleSidebarCollapse={ToggleSidebarCollapse}
+          />
 
           <Content colors={colors} pointer={pointer} className={sidebarCollapse ? 'collapsed' : ''}>
             {selectedBoard > -1 ? (
@@ -455,7 +431,9 @@ function App() {
               </div>
             ) : (
               <div className="content d-flex flex-column justify-content-center align-items-center">
-                <h2>This board is empty. Create a new column to get started.</h2>
+                <h2>
+                  This board is empty. Create a new column to get started. {width} / {height}
+                </h2>
                 <button className="btn large prim" disabled={selectedBoard === -1}>
                   + Add New Column
                 </button>
@@ -517,6 +495,26 @@ function App() {
         }
         target={deleteTarget}
         onDelete={ChangeData}
+      />
+      <SidebarMenuModal
+        colors={colors}
+        show={showSidebarMenu}
+        onHide={() => {
+          console.log('onHide SidebarMenuModal');
+          setShowSidebarMenu(false);
+          setMobilChevronDown(!mobilChevronDown);
+        }}
+        sidebarCollapse={sidebarCollapse}
+        data={data}
+        selectedBoard={selectedBoard}
+        selectBoard={(val: any) => {
+          selectBoard(val);
+          setShowSidebarMenu(false);
+          setMobilChevronDown(!mobilChevronDown);
+        }}
+        setEditedBoard={setEditedBoard}
+        setNewBoardModalShow={setNewBoardModalShow}
+        ToggleSidebarCollapse={ToggleSidebarCollapse}
       />
     </div>
   );
@@ -717,104 +715,15 @@ const Main = styled.div`
   height: calc(100vh - 116px);
 `;
 
-const Sidebar = styled.div<TNavProp>`
-  width: 300px;
-  margin-bottom: 32px;
-  border-right: 1px solid ${({ colors }) => colors.lines_light};
-
-  &.collapsed {
-    width: 0px;
-  }
-
-  .sidebar-heading {
-    padding: 14px 93px 15px 32px;
-  }
-
-  .nav-item {
-    padding: 14px 0px 15px 32px;
-    margin-right: 24px;
-    margin-bottom: 2px;
-    border-radius: 0px 100px 100px 0px;
-    color: ${({ colors }) => colors.medium_grey};
-    cursor: url('${({ pointer }) => pointer}'), pointer;
-
-    &:hover {
-      background-color: ${({ colors }) => colors.main_purple10};
-      color: ${({ colors }) => colors.main_purple};
-
-      svg path {
-        fill: ${({ colors }) => colors.main_purple};
-      }
-    }
-
-    &.active {
-      background-color: ${({ colors }) => colors.main_purple};
-      color: white;
-
-      svg path {
-        fill: white;
-      }
-    }
-
-    &.marker {
-      position: fixed;
-      bottom: 32px;
-      width: 275px;
-
-      &.collapsed {
-        width: 58px;
-        padding: 16px 22px 16px 18px;
-        background-color: ${({ colors }) => colors.main_purple};
-
-        &:hover {
-          background-color: ${({ colors }) => colors.main_purple_hover};
-        }
-
-        svg path {
-          fill: white;
-        }
-      }
-    }
-
-    h3 {
-      margin-bottom: 0px;
-      margin-left: 16px;
-    }
-
-    svg {
-      path {
-        fill: ${({ colors }) => colors.medium_grey};
-      }
-    }
-  }
-
-  .nav-item-plus {
-    padding: 14px 0px 15px 32px;
-    border-radius: 0px 20px 20px 0px;
-    cursor: url('${({ pointer }) => pointer}'), pointer;
-    color: ${({ colors }) => colors.main_purple};
-
-    &:hover {
-    }
-
-    h3 {
-      margin-bottom: 0px;
-      margin-left: 16px;
-    }
-
-    svg {
-      path {
-        fill: ${({ colors }) => colors.main_purple};
-      }
-    }
-  }
-`;
-
 const Content = styled.div<TNavProp>`
   background-color: ${({ colors }) => colors.light_grey};
   height: calc(100vh - 116px);
   width: calc(100vw - 305px);
   overflow-y: hidden;
+
+  @media (max-width: 575px) {
+    width: 100vw;
+  }
 
   &.collapsed {
     width: 100vw;

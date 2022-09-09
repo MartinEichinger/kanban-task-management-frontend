@@ -140,4 +140,10 @@ body .fade.modal {
   --bs-modal-padding: 12px 2rem 2rem;
   --bs-modal-header-border-width: 0px;
   --bs-modal-width: 480px;
+}
+
+@media (max-width: 575px) {
+  body .fade.modal-backdrop {
+    top: 99px;
+  }
 }/*# sourceMappingURL=index.css.map */
