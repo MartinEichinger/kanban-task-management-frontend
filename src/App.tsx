@@ -178,13 +178,13 @@ function App() {
   };
 
   const selectBoard = (num: number) => {
-    if (debug >= 0) console.log('selectBoard: ', num);
+    if (debug >= 1) console.log('selectBoard: ', num);
     setSelectedBoard(num);
   };
 
   const selectTask = (col: number, task: number) => {
-    if (debug >= 0) console.log('selectColumn: ', col);
-    if (debug >= 0) console.log('selectTask: ', task);
+    if (debug >= 1) console.log('selectColumn: ', col);
+    if (debug >= 1) console.log('selectTask: ', task);
     setSelectedCol(col);
     setSelectedTask(task);
     setTaskModalShow(true);
