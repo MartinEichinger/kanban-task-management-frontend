@@ -21,8 +21,9 @@ export async function getData(queryScheme: any, type: any) {
           .then(() => {
             authenticated = true;
           })
-          .catch(() => {
-            window.alert('Invalid credentials');
+          .catch((error) => {
+            console.log(error);
+            //return error;
           });
       }
     });
