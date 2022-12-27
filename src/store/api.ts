@@ -23,7 +23,7 @@ export async function getData(queryScheme: any, type: any) {
           })
           .catch((error) => {
             console.log(error);
-            //return error;
+            return error;
           });
       }
     });
