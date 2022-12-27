@@ -348,7 +348,7 @@ export const getDatabaseEntries = (): AppThunk => async (dispatch) => {
   if (debug > 0) console.log('task/getTasks');
 
   // prepare action
-  let actionType = 'task/getDatabaseEntries';
+  let actionType = 'task/requestDatabaseEntries';
   let queryScheme = `
   query {
     boards {
@@ -379,6 +379,7 @@ export const getDatabaseEntries = (): AppThunk => async (dispatch) => {
   let res = await getData(queryScheme, queryType); //searchUrl, headers, formData.method);
 
   // Load data to store
+  actionType = 'task/receivedDatabaseEntries';
   dispatch(itemsReceived({ boards: (res as any).boards, type: actionType }));
 };
 
