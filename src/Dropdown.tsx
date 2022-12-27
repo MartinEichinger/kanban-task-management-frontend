@@ -19,7 +19,6 @@ const Dropdown: React.FC<TProps> = ({ className, colors, title, text, entries, c
   let defVal;
 
   const selectDropdown = (option: any) => {
-    console.log(option);
     changeDropdown(option);
   };
 
@@ -94,7 +93,3 @@ const DropdownMain = styled.div<TNavProp>`
     }
   }
 `;
-
-/* 
-selected={entry.name === text} 
-*/

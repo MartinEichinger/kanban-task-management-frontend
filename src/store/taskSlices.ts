@@ -2,7 +2,7 @@ import { createSlice, PayloadAction, current } from '@reduxjs/toolkit';
 import { getData } from './api';
 import { AppThunk } from './store';
 
-const debug = 1;
+const debug = 0;
 
 // DATABASE
 export interface IDatabaseBoard {
@@ -57,11 +57,26 @@ interface IPayloadBoards {
   boards: IDatabaseBoard[];
 }
 
+interface IPayloadBoard {
+  type: string;
+  boards: IDatabaseBoard;
+}
+
 interface IPayloadTask {
   type: string;
   task: IDatabaseTask;
   stateAccess: IStateAccess;
 }
+
+interface IPayloadDeleteTask {
+  type: string;
+  props: any;
+}
+
+type IPayloadDeleteBoard = {
+  type: string;
+  props: IDeleteBoard;
+};
 
 interface IPayloadError {
   error: any;
@@ -73,37 +88,13 @@ export interface IUpdateTask {
   task: IDatabaseTask;
 }
 
-/////////
+interface IUpdateBoard extends IDatabaseBoard {}
 
-type TPropCreateBoard = {
-  id: string;
-  name: string;
-  columns: {
-    id: string;
-    name: string;
-  }[];
-};
-
-type TPayloadDeleteTask = {
-  type: string;
-  props: any;
-};
-
-type TPayloadCreateBoard = {
-  type: string;
-  props: TPropCreateBoard;
-};
-
-type TPropDeleteBoard = {
+interface IDeleteBoard {
   id: number;
   arrNo: number;
   val: any;
-};
-
-type TPayloadDeleteBoard = {
-  type: string;
-  props: TPropDeleteBoard;
-};
+}
 
 // initial state
 const initialState: IInitialState = {
@@ -145,8 +136,6 @@ export const slice = createSlice({
           });
         });
       });
-
-      console.log('all: ', state.boards);
 
       // finalize data update
       state.loading = false;
@@ -214,23 +203,17 @@ export const slice = createSlice({
       // push selected task to new column
       //(state as any).boards[selectedBoard].columns[col_id].tasks.push(cut);
       (state as any).boards[selectedBoard].columns.map((col: any, i: any) => {
-        console.log('Col: ', col, i);
         if (col.name === status.name) {
           col.tasks.push(cut);
           // get col_id
           //col_id = (state as any).boards[selectedBoard].columns[i].id;
         }
       });
-      // update db
-      //console.log('updateDirectus: ', id, val.name);
-
-      console.log(state.boards);
-      //state.boards = el;
 
       state.loading = false;
     },
 
-    taskDeleted: (state, action: PayloadAction<TPayloadDeleteTask>) => {
+    taskDeleted: (state, action: PayloadAction<IPayloadDeleteTask>) => {
       // destruct input data
       var { selectedBoard, selectedCol, selectedTask } = action.payload.props.val;
       if (debug >= 1)
@@ -248,9 +231,9 @@ export const slice = createSlice({
       state.loading = false;
     },
 
-    boardCreated: (state, action: PayloadAction<TPayloadCreateBoard>) => {
+    boardCreated: (state, action: PayloadAction<IPayloadBoard>) => {
       // destruct input data
-      var { id: __id, name: __name, columns: __columns } = action.payload.props;
+      var { id: __id, name: __name, columns: __columns } = action.payload.boards;
       if (debug >= 1) console.log('board/boardCreated: ', __id, __name, __columns);
 
       var newBoard = {
@@ -271,9 +254,9 @@ export const slice = createSlice({
       state.loading = false;
     },
 
-    boardUpdated: (state, action: PayloadAction<TPayloadCreateBoard>) => {
+    boardUpdated: (state, action: PayloadAction<IPayloadBoard>) => {
       // destruct input data
-      var { id: __id, name: __name, columns: __columns } = action.payload.props;
+      var { id: __id, name: __name, columns: __columns } = action.payload.boards;
       if (debug >= 1) console.log('board/boardUpdated: ', __id, __name, __columns);
 
       // find right board
@@ -312,7 +295,7 @@ export const slice = createSlice({
       state.loading = false;
     },
 
-    boardDeleted: (state, action: PayloadAction<TPayloadDeleteBoard>) => {
+    boardDeleted: (state, action: PayloadAction<IPayloadDeleteBoard>) => {
       // destruct input data
       var { id: __id, arrNo: __arrNo } = action.payload.props;
       if (debug >= 1) console.log('board/boardDeleted: ', __id, __arrNo);
@@ -352,8 +335,8 @@ export const getDatabaseEntries = (): AppThunk => async (dispatch) => {
   if (debug > 0) console.log('task/getTasks');
 
   // prepare action
-  let actionType = 'taskData/itemsReceived';
-  let queryScheme = `
+  let __actionType = 'logging';
+  let __queryScheme = `
   query {
     boards {
       id
@@ -374,22 +357,21 @@ export const getDatabaseEntries = (): AppThunk => async (dispatch) => {
       }
     }
   }`;
-  let queryType = 'item';
 
   // Dispatch Request
-  dispatch(itemsRequested({ type: actionType }));
+  dispatch(itemsRequested({ type: __actionType }));
 
   // Perform Request
-  let data = await getData(queryScheme, queryType); //searchUrl, headers, formData.method);
-  console.log('taskSlices/getDBEntries: ', data);
+  let data = await getData(__queryScheme);
+  if (debug > 1) console.log('taskSlices/getDBEntries: ', data);
 
   // send error due to failed get
   if (data.error) {
     dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
   } else {
     // Load data to store
-    actionType = 'taskData/itemsRequested';
-    dispatch(itemsReceived({ boards: (data as any).boards, type: actionType }));
+    __actionType = 'toast';
+    dispatch(itemsReceived({ boards: (data as any).boards, type: __actionType }));
   }
 };
 
@@ -402,12 +384,12 @@ export const createTask =
 
     if (debug) console.log('taskData/createTask: ', task, stateAccess);
 
-    var __actionType = 'taskData/itemsReceived';
+    var __actionType = 'logging';
     // Dispatch Request
     dispatch(itemsRequested({ type: __actionType }));
 
     // Prepare/Perform Mutation
-    var queryScheme = `mutation {
+    var __queryScheme = `mutation {
       create_kanban_tasks_item(
         data: {
           column_id: {
@@ -434,14 +416,14 @@ export const createTask =
         }
       }
     }`;
-    var data = await getData(queryScheme, 'item');
+    var data = await getData(__queryScheme);
 
     // send error due to failed get
     if (data.error) {
       dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
     } else {
       // Load data to store
-      var __actionType = 'taskData/taskCreated';
+      var __actionType = 'logging';
       dispatch(
         taskCreated({
           type: __actionType,
@@ -465,7 +447,7 @@ export const updateTask =
     if (debug) console.log('taskSlices/updateTask: ', task, stateAccess);
 
     // Prepare action/request
-    var __actionType = 'task/updateTask';
+    var __actionType = 'logging';
     var __state = getState().taskData;
     // Dispatch Request
     dispatch(itemsRequested({ type: __actionType }));
@@ -475,7 +457,6 @@ export const updateTask =
     var __col_name;
     var __id = (__state as any).boards[selectedBoard].columns[selectedCol].tasks[selectedTask].id;
     (__state as any).boards[selectedBoard].columns.map((col: any, i: any) => {
-      console.log('Col: ', col, i);
       if (col.name === status.name) {
         // get col_id
         __col_id = (__state as any).boards[selectedBoard].columns[i].id;
@@ -512,7 +493,7 @@ export const updateTask =
         }
       }
     }`;
-    var data = await getData(__queryScheme, 'item');
+    var data = await getData(__queryScheme);
 
     // send error due to failed get
     if (data.error) {
@@ -533,16 +514,16 @@ export const updateTask =
   };
 
 export const createBoard =
-  ({ name, columns }: TPropCreateBoard): AppThunk =>
+  ({ name, columns }: IUpdateBoard): AppThunk =>
   async (dispatch) => {
     if (debug) console.log('taskData/createBoard: ', name, columns);
 
-    let actionType = 'board/createBoard';
+    let __actionType = 'logging';
     // Dispatch Request
-    dispatch(itemsRequested({ type: actionType }));
+    dispatch(itemsRequested({ type: __actionType }));
 
     // Prepare/Perform Mutation
-    var queryScheme = `mutation {
+    var __queryScheme = `mutation {
       create_boards_item(
         data: {
           name: "${name}",
@@ -563,34 +544,35 @@ export const createBoard =
         }
       }
     }`;
-    var data = await getData(queryScheme, 'item');
+    var data = await getData(__queryScheme);
+    if (debug) console.log('taskData/createBoard: ', data);
 
     // send error due to failed get
     if (data.error) {
       dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
     } else {
-      actionType = 'taskData/boardCreated';
+      __actionType = 'toast';
       // Load data to store
       dispatch(
         boardCreated({
-          type: actionType,
-          props: data.create_boards_item,
+          type: __actionType,
+          boards: data.create_boards_item,
         })
       );
     }
   };
 
 export const updateBoard =
-  ({ id, name, columns }: TPropCreateBoard): AppThunk =>
+  ({ id, name, columns }: IUpdateBoard): AppThunk =>
   async (dispatch) => {
     if (debug) console.log('taskSlices/updateBoard: ', id, name, columns);
 
-    let actionType = 'board/updateBoard';
+    let __actionType = 'logging';
     // Dispatch Request
-    dispatch(itemsRequested({ type: actionType }));
+    dispatch(itemsRequested({ type: __actionType }));
 
     // Prepare/Perform Mutation
-    var queryScheme = `mutation {
+    var __queryScheme = `mutation {
       update_boards_item(
         id: ${id},
         data: {
@@ -609,7 +591,7 @@ export const updateBoard =
         }
       }
     }`;
-    var data = await getData(queryScheme, 'item');
+    var data = await getData(__queryScheme);
 
     // send error due to failed get
     if (data.error) {
@@ -618,8 +600,8 @@ export const updateBoard =
       // Load data to store
       dispatch(
         boardUpdated({
-          type: actionType,
-          props: data.update_boards_item,
+          type: __actionType,
+          boards: data.update_boards_item,
         })
       );
     }
@@ -643,17 +625,16 @@ var actionTypesDeleteItems: TaTDI = {
 };
 
 export const deleteItems =
-  ({ id, arrNo, val }: TPropDeleteBoard): AppThunk =>
+  ({ id, arrNo, val }: IDeleteBoard): AppThunk =>
   async (dispatch) => {
     if (debug) console.log('taskSlices/deleteItems: ', id, arrNo, val);
 
     // determine actionType and query operation
-    let actionType: string = val.operation; // e.g. 'board/deleteBoard';
-    let queryOperation = actionTypesDeleteItems[actionType].operation; // as keyof TaTDI].operation;
-    let reducerMethod = actionTypesDeleteItems[actionType].reducer;
+    let __actionType = 'logging';
+    let queryOperation = actionTypesDeleteItems[val.operation].operation; // as keyof TaTDI].operation;
 
     // Dispatch Request
-    dispatch(itemsRequested({ type: actionType }));
+    dispatch(itemsRequested({ type: __actionType }));
 
     // Prepare/Perform Mutation
     var queryScheme = `mutation {
@@ -661,18 +642,19 @@ export const deleteItems =
         id
       }
     }`;
-    var data = await getData(queryScheme, 'item');
+    var data = await getData(queryScheme);
 
     // send error due to failed get
     if (data.error) {
       dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
     } else {
       // Load data to store
+      __actionType = 'toast';
       var fctLoad = {
-        type: actionType,
+        type: __actionType,
         props: { ...data[queryOperation], arrNo: arrNo, val: val },
       };
-      actionType === 'board/deleteBoard'
+      val.operation === 'board/deleteBoard'
         ? dispatch(boardDeleted(fctLoad))
         : dispatch(taskDeleted(fctLoad));
     }

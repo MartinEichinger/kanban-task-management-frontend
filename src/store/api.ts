@@ -2,9 +2,9 @@ import { directus } from '../services/directus';
 
 const envEmail: string = process.env.REACT_APP_EMAIL as string;
 const envPwd: string = process.env.REACT_APP_PWD as string;
-const debug = 1;
+const debug = 0;
 
-export async function getData(queryScheme: any, type: any) {
+export async function getData(queryScheme: any) {
   //url: string, headers: any, method: string): Promise<any> {
   let authenticated = false;
   // Try to authenticate with token if exists
@@ -27,24 +27,19 @@ export async function getData(queryScheme: any, type: any) {
         });
       //}
     });
-  console.log('auth: ', auth);
   // interrupt request due to failed auth
   if (auth !== undefined) return { error: auth };
 
-  console.log('run query: ', queryScheme);
+  if (debug > 1) console.log('API/Run query: ', queryScheme);
   let response;
   try {
-    if (type === 'item') {
-      response = await directus.graphql.items(queryScheme);
-    } else if (type === 'relation') {
-      response = await directus.graphql.system(queryScheme);
-    }
+    response = await directus.graphql.items(queryScheme);
   } catch (error) {
     console.log(error);
   }
 
   let res = (response as any).data;
 
-  if (debug) console.log('api: ', res);
+  if (debug > 1) console.log('API/Response: ', res);
   return res;
 }

@@ -117,7 +117,6 @@ const TaskModal: React.FC<TModalProp> = (props) => {
                       var newTask: any = produce(task, (draftTask: any) => {
                         draftTask.subtasks[i].isCompleted = val === false ? 0 : 1;
                       });
-                      console.log('HINT: ', board.columns, val, task, newTask);
                       dispatch(
                         updateTask({
                           stateAccess: {
@@ -147,7 +146,6 @@ const TaskModal: React.FC<TModalProp> = (props) => {
             text={task?.status.name}
             entries={board?.columns}
             changeDropdown={(val: string) => {
-              console.log('TaskModal/ChangeStatus: ', val);
               props.changeData({
                 stateAccess: {
                   selectedBoard,

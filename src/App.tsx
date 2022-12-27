@@ -79,7 +79,7 @@ function App() {
   };
   data.boards = useAppSelector((state) => state.taskData.boards);
 
-  const debug = 2;
+  const debug = 0;
 
   useEffect(() => {
     // get directus data
@@ -361,7 +361,6 @@ function App() {
         edit={[selectedBoard, selectedCol, editedTask]}
         data={data}
         changeData={(val: any) => {
-          console.log('App/NewTaskModal: ', val);
           editedTask > -1 ? dispatch(updateTask(val)) : dispatch(createTask(val));
           setEditedTask(-1);
           setNewTaskModalShow(false);
@@ -371,7 +370,6 @@ function App() {
         colors={colors}
         show={newBoardModalShow}
         onHide={() => {
-          console.log('onHide New BoardModal');
           setNewBoardModalShow(false);
           setEditedBoard(-1);
         }}
@@ -380,7 +378,7 @@ function App() {
           if (val.edit > -1) {
             dispatch(updateBoard({ id: id, name: val.title, columns: val.columns }));
           } else {
-            dispatch(createBoard({ id: '', name: val.title, columns: val.columns }));
+            dispatch(createBoard({ id: -1, name: val.title, columns: val.columns }));
           }
           setNewBoardModalShow(false);
         }}
@@ -391,7 +389,6 @@ function App() {
         colors={colors}
         show={deleteModalShow}
         onHide={() => {
-          console.log('onHide DeleteModal');
           setDeleteModalShow(false);
         }}
         selection={{ selectedBoard, selectedCol, selectedTask }}
@@ -402,7 +399,6 @@ function App() {
         }
         target={deleteTarget}
         onDelete={(val: any) => {
-          console.log(val);
           deleteTarget === 'board'
             ? dispatch(
                 deleteItems({
@@ -426,7 +422,6 @@ function App() {
         colors={colors}
         show={showSidebarMenu}
         onHide={() => {
-          console.log('onHide SidebarMenuModal');
           setShowSidebarMenu(false);
           setMobilChevronDown(!mobilChevronDown);
         }}
