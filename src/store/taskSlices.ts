@@ -400,9 +400,9 @@ export const createTask =
     var { selectedBoard, selectedCol, selectedTask, selectedSubtask } = stateAccess;
     var { id, title, description, status, subtasks } = task;
 
-    if (debug) console.log('taskSlices/createTask: ', task, stateAccess);
+    if (debug) console.log('taskData/createTask: ', task, stateAccess);
 
-    var __actionType = 'task/createTask';
+    var __actionType = 'taskData/itemsReceived';
     // Dispatch Request
     dispatch(itemsRequested({ type: __actionType }));
 
@@ -441,6 +441,7 @@ export const createTask =
       dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
     } else {
       // Load data to store
+      var __actionType = 'taskData/taskCreated';
       dispatch(
         taskCreated({
           type: __actionType,
@@ -534,7 +535,7 @@ export const updateTask =
 export const createBoard =
   ({ name, columns }: TPropCreateBoard): AppThunk =>
   async (dispatch) => {
-    if (debug) console.log('taskSlices/createBoard: ', name, columns);
+    if (debug) console.log('taskData/createBoard: ', name, columns);
 
     let actionType = 'board/createBoard';
     // Dispatch Request
