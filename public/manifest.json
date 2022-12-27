@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "EdMadd Kanban",
+  "name": "Kanban Task Management App by EdMadd",
   "icons": [
     {
       "src": "favicon.ico",
