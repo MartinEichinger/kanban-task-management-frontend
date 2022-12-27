@@ -1,11 +1,6 @@
 import * as React from 'react';
-import { useState } from 'react';
 import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import Checkbox from './Checkbox';
-import Dropdown from './Dropdown';
-import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import pointer from './images/pointer.png';
 
 interface TSelectionProp {
@@ -54,9 +49,14 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
             className="btn small destruct mr-2 mb-2 w-100"
             onClick={() => {
               if (props.target === 'board') {
-                props.onDelete('delete-board', selectedBoard);
+                props.onDelete({ operation: 'board/deleteBoard', selectedBoard });
               } else {
-                props.onDelete('delete-task', selectedBoard, selectedCol, selectedTask);
+                props.onDelete({
+                  operation: 'tasks/deleteTask',
+                  selectedBoard,
+                  selectedCol,
+                  selectedTask,
+                });
               }
             }}
           >

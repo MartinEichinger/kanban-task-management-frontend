@@ -4,16 +4,19 @@ import { useState, useEffect } from 'react';
 import Textfield from './Textfield';
 import { ReactComponent as Cross } from './icon-cross.svg';
 
-interface TProps {
+interface IMultitaskfield {
   className?: string;
   colors: any;
   title: string;
   placeholder?: string[];
-  values?: any;
+  values: {
+    id: string;
+    name: string;
+  }[];
   onChange?: any;
 }
 
-const Multitaskfield: React.FC<TProps> = ({
+const Multitaskfield: React.FC<IMultitaskfield> = ({
   className,
   colors,
   title,
@@ -25,14 +28,17 @@ const Multitaskfield: React.FC<TProps> = ({
 
   if (debug >= 1) console.log('Multitaskfield: ', title, placeholder, values);
   const placeholderList = placeholder;
-  const [taskList, setTaskList] = useState(['', '']);
+  const [taskList, setTaskList] = useState(values);
 
   useEffect(() => {
     if (debug >= 2) console.log('Multitaskfield/useEffect: ', values);
-    if (values[0] !== '') {
+    if (values !== undefined) {
       setTaskList(values);
     } else {
-      setTaskList(['', '']);
+      setTaskList([
+        { id: '', name: '' },
+        { id: '', name: '' },
+      ]);
     }
   }, [values]);
 
@@ -44,21 +50,22 @@ const Multitaskfield: React.FC<TProps> = ({
       list.splice(idx, 1);
       setTaskList([...list]);
     } else {
-      list.push('');
+      list.push({ id: '', name: '' });
       setTaskList([...list]);
     }
 
     onChange(list);
   };
 
-  const ChangeSubtask = (text: string, idx: number) => {
-    if (debug >= 2) console.log('MultitaskField/ChangeSubtask: ', text, idx);
+  const ChangeSubtask = (id: string, text: string, idx: number) => {
+    if (debug >= 2) console.log('MultitaskField/ChangeSubtask: ', id, text, idx);
     var list = taskList;
-    list[idx] = text;
+    list[idx] = { id: id, name: text };
     setTaskList([...list]);
     onChange(list);
   };
 
+  if (debug >= 1) console.log('Multitaskfield/beforeRender: ', taskList);
   return (
     <MultitaskfieldMain colors={colors} className={className}>
       <label htmlFor="Textarea">{title}</label>
@@ -69,8 +76,8 @@ const Multitaskfield: React.FC<TProps> = ({
             <Textfield
               colors={colors}
               placeholder={placeholderList?.[i % 10]}
-              value={taskList[i]}
-              onChange={(text: string) => ChangeSubtask(text, i)}
+              value={taskList[i].name}
+              onChange={(text: string) => ChangeSubtask(taskList[i].id, text, i)}
             />
             <CrossMTF onClick={() => AddRemoveSubTask(i)} />
           </div>

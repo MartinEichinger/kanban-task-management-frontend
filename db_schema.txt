@@ -1,0 +1,21 @@
+boards
+    id
+    name
+    columns (O2M boards_id)
+kanban_columns
+    boards_id (M2O id)
+    id
+    name
+    tasks (02M column_id)
+kanban_tasks
+    column_id (M20 id)
+    id
+    title
+    description
+    status
+    subtasks (O2M task_id)
+kanban_subtasks
+    task_id (M2O id)
+    id
+    title
+    isCompleted

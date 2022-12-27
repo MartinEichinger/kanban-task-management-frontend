@@ -6,6 +6,7 @@ import Textfield from './Textfield';
 import Textarea from './Textarea';
 import Multitaskfield from './Multitaskfield';
 import Dropdown from './Dropdown';
+import IDatabaseTask from './store/taskSlices';
 
 interface TModalProp {
   colors: any;
@@ -20,47 +21,87 @@ interface TModalProp {
 const NewTaskModal: React.FC<TModalProp> = (props) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [subtasks, setSubtasks] = useState(['']);
-  const [status, setStatus] = useState(props.entriesSelect[0]?.name);
+  const [subtasks, setSubtasks] = useState([{ id: '', title: '', isCompleted: 0 }]);
+  const [status, setStatus] = useState({ id: props.entriesSelect[0], name: props.entriesSelect[0] }); // number of entriesSelect
 
-  const debug = 2;
+  const debug = 0;
 
   var subtasksEntries = props.data.boards?.[props.edit[0]]?.columns[props.edit[1]]?.tasks[
     props.edit[2]
   ]?.subtasks.map((task: any) => {
-    return task.title;
+    return { id: task.id, title: task.title, isCompleted: task.isCompleted };
   });
 
   useEffect(() => {
-    if (debug >= 2) console.log('NewTaskModal/useEffect: ', props.edit[2], subtasksEntries);
+    if (debug >= 2) console.log('NewTaskModal/useEffect: ', props.edit, props.entriesSelect, status);
     if (props.edit[2] > -1) {
       setTitle(props.data.boards[props.edit[0]].columns[props.edit[1]].tasks[props.edit[2]].title);
       setDescription(
         props.data.boards[props.edit[0]].columns[props.edit[1]].tasks[props.edit[2]].description
       );
       setSubtasks(subtasksEntries);
-      setStatus(props.data.boards[props.edit[0]].columns[props.edit[1]].name);
+      setStatus({
+        id: props.entriesSelect[props.edit[1]]?.id,
+        name: props.data.boards[props.edit[0]].columns[props.edit[1]].name,
+      });
     } else {
       setTitle('');
+      setStatus({ id: props.entriesSelect[0]?.id, name: props.entriesSelect[0]?.name });
     }
-  }, [props.edit]);
+  }, [props.edit]); //, props.entriesSelect]);
 
   const AddNewTask = () => {
     //Validation
-
+    console.log('NewTaskModal/AddNewTask: ', status);
     // Return value
-    props.changeData(title, description, subtasks, status, props.edit);
+    props.changeData({
+      task: {
+        id: null,
+        title,
+        description,
+        status,
+        subtasks,
+      },
+      stateAccess: {
+        selectedBoard: props.edit[0],
+        selectedCol: props.edit[1],
+        selectedTask: props.edit[2],
+        selectedSubtask: null,
+      },
+    });
+    ResetData();
+  };
+
+  const ChangeTask = () => {
+    //Validation
+    console.log('NewTAskModal/ChangeTask: ', title, description, subtasks, status);
+    // Return value
+    props.changeData({
+      task: {
+        id: null,
+        title,
+        description,
+        status,
+        subtasks,
+      },
+      stateAccess: {
+        selectedBoard: props.edit[0],
+        selectedCol: props.edit[1],
+        selectedTask: props.edit[2],
+        selectedSubtask: null,
+      },
+    });
     ResetData();
   };
 
   const ResetData = () => {
     setTitle('');
     setDescription('');
-    setSubtasks(['']);
+    setSubtasks([{ id: '', title: '', isCompleted: 0 }]);
     setStatus(props.entriesSelect[0]?.name);
   };
 
-  if (debug >= 1) console.log('NewTaskModal/render: ', props.entriesSelect);
+  if (debug > 0) console.log('NewTaskModal/render: ', props.entriesSelect, status, subtasks);
   return (
     <TaskModalMain
       colors={props.colors}
@@ -106,18 +147,29 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
               'e.g. Take serious break',
               'e.g. Take work break',
             ]}
-            values={subtasks}
-            onChange={setSubtasks}
+            values={subtasks.map((entry) => {
+              return { id: entry.id, name: entry.title };
+            })}
+            onChange={(val: any) => {
+              console.log('NewTAskModal/Multitaskfield: ', val);
+              setSubtasks(
+                val.map((entry: any) => {
+                  return { id: entry.id, title: entry.name, isCompleted: 0 };
+                })
+              );
+            }}
           />
 
           <DropdownNTM
             colors={props.colors}
             title="Status"
-            text={status}
+            text={status.name}
             entries={props.entriesSelect}
-            changeDropdown={setStatus}
+            changeDropdown={(val) =>
+              setStatus({ id: props.entriesSelect[val].id, name: props.entriesSelect[val].name })
+            }
           />
-          <button className="small prim w-100" onClick={AddNewTask}>
+          <button className="small prim w-100" onClick={props.edit[2] > -1 ? ChangeTask : AddNewTask}>
             {props.edit[2] > -1 ? 'Save Changes' : 'Create Task'}
           </button>
         </>

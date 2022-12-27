@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from '@emotion/styled';
+import produce from 'immer';
+
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Checkbox from './Checkbox';
@@ -8,21 +10,26 @@ import Dropdown from './Dropdown';
 import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import pointer from './images/pointer.png';
 
+import { updateTask } from './store/taskSlices';
+import { useAppSelector, useAppDispatch } from './store/hooks';
+
 interface TDataProp {
   boards: {
     name: string;
     columns?: {
       name: string;
-      tasks: {
-        title: string;
-        description: string;
-        status: string;
-        subtasks: {
-          title: string;
-          isCompleted: boolean;
-        }[];
-      }[];
+      tasks: TTaskProp[];
     }[];
+  }[];
+}
+
+interface TTaskProp {
+  title: string;
+  description: string;
+  status: string;
+  subtasks: {
+    title: string;
+    isCompleted: boolean;
   }[];
 }
 
@@ -38,18 +45,19 @@ interface TModalProp {
   onHide: any;
   boards: TDataProp;
   selection: TSelectionProp;
-  changeData: any;
   handleMenuSelection: any;
+  changeData: any;
 }
 
 const TaskModal: React.FC<TModalProp> = (props) => {
   var { selectedBoard, selectedCol, selectedTask } = props.selection;
-  var board = selectedBoard > -1 ? props.boards.boards?.[selectedBoard] : undefined;
+  var board = selectedBoard > -1 ? (props as any).boards?.[selectedBoard] : undefined;
   var col = selectedBoard > -1 && selectedCol > -1 ? board?.columns?.[selectedCol] : undefined;
   var task =
     selectedBoard > -1 && selectedCol > -1 && selectedTask > -1 ? col?.tasks?.[selectedTask] : undefined;
 
   const debug = 0;
+  const dispatch = useAppDispatch();
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -60,12 +68,6 @@ const TaskModal: React.FC<TModalProp> = (props) => {
     console.log('CustomModal/Task: ', selectedTask);
   }
 
-  const changeFormfield = (type: string, val: boolean | string, selectedSubtask?: number) => {
-    console.log('Change formfield: ', type, val, selectedSubtask);
-    // Status of subtask or task
-    props.changeData(type, selectedBoard, selectedCol, selectedTask, selectedSubtask, val);
-  };
-
   const onClickMenu = (sel: string) => {
     setShowMenu(false);
     if (sel === 'edit') {
@@ -75,6 +77,7 @@ const TaskModal: React.FC<TModalProp> = (props) => {
     }
   };
 
+  if (debug > 0) console.log('TaskModal/beforeRender: ', board, props, task);
   return (
     <TaskModalMain
       colors={props.colors}
@@ -103,14 +106,36 @@ const TaskModal: React.FC<TModalProp> = (props) => {
           <p>{task?.description}</p>
           <p className="bold">Subtasks({task?.subtasks.length})</p>
           <div className="subtasks">
-            {task?.subtasks.map((subtask, i) => {
+            {task?.subtasks.map((subtask: any, i: any) => {
               return (
                 <div className="subtask" key={i}>
                   <Checkbox
                     colors={props.colors}
                     text={subtask.title}
                     checked={subtask.isCompleted}
-                    onChange={(val: any) => changeFormfield('subtask', val, i)}
+                    onChange={(val: any) => {
+                      var newTask: any = produce(task, (draftTask: any) => {
+                        draftTask.subtasks[i].isCompleted = val === false ? 0 : 1;
+                      });
+                      console.log('HINT: ', board.columns, val, task, newTask);
+                      dispatch(
+                        updateTask({
+                          stateAccess: {
+                            selectedBoard,
+                            selectedCol,
+                            selectedTask,
+                            selectedSubtask: i,
+                          },
+                          task: {
+                            id: -1,
+                            title: newTask.title,
+                            description: newTask.description,
+                            status: newTask.status,
+                            subtasks: newTask.subtasks,
+                          },
+                        })
+                      );
+                    }}
                   />
                 </div>
               );
@@ -119,9 +144,26 @@ const TaskModal: React.FC<TModalProp> = (props) => {
           <Dropdown
             colors={props.colors}
             title="Current Status"
-            text={task?.status}
+            text={task?.status.name}
             entries={board?.columns}
-            changeDropdown={(val: string) => changeFormfield('task', val)}
+            changeDropdown={(val: string) => {
+              console.log('TaskModal/ChangeStatus: ', val);
+              props.changeData({
+                stateAccess: {
+                  selectedBoard,
+                  selectedCol,
+                  selectedTask,
+                  selectedSubtask: -1,
+                },
+                task: {
+                  id: task.id,
+                  title: task.title,
+                  description: task.description,
+                  status: { id: board.columns[val].id, name: board.columns[val].name },
+                  subtasks: task.subtasks,
+                },
+              });
+            }}
           />
         </>
       </Modal.Body>

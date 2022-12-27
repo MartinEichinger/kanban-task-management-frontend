@@ -18,12 +18,12 @@ interface TModalProp {
 
 const NewBoardModal: React.FC<TModalProp> = (props) => {
   const [title, setTitle] = useState('');
-  const [columns, setColumns] = useState(['']);
+  const [columns, setColumns] = useState([{ id: '', name: '' }]);
 
   const debug = 0;
 
   var cols = props.data.boards?.[props.edit]?.columns.map((col: any) => {
-    return col.name;
+    return { id: col.id, name: col.name };
   });
   if (debug >= 2) console.log('NewBoardModal: ', cols);
   if (debug >= 2) console.log('NewBoardModal: ', props.edit, props.data.boards?.[props.edit]?.name);
@@ -42,14 +42,16 @@ const NewBoardModal: React.FC<TModalProp> = (props) => {
     //Validation
 
     // Return value
-    props.changeData(title, columns, props.edit);
+    props.changeData({ title, columns, edit: props.edit });
     ResetData();
   };
 
   const ResetData = () => {
     setTitle('');
-    setColumns(['']);
+    setColumns([{ id: '', name: '' }]);
   };
+
+  if (debug >= 2) console.log('NewBoardModal/beforeRender: ');
 
   return (
     <BoardModalMain

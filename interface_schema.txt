@@ -1,0 +1,65 @@
+
+##########################################
+DATABASE DATA
+
+IDatabaseBoard {
+  id: number;
+  name: string;
+  columns: IDatabaseColumn[];
+}
+
+IDatabaseColumn {
+  id: number;
+  name: string;
+  tasks: IDatabaseTask[];
+}
+
+IDatabaseTask {
+  id: number;
+  title: string;
+  description: string;
+  status: string;
+  subtasks: IDatabaseSubtask[];
+}
+
+IDatabaseSubtask {
+  id: number;
+  title: string;
+  isCompleted: boolean;
+}
+
+#############################################
+STATE ACCESS 
+
+IStateAccess {
+  selectedBoard: number;
+  selectedCol: number;
+  selectedTask: number;
+  selectedSubtask: number;
+}
+
+#############################################
+REDUCER
+
+IPayloadType {
+  type: string;
+}
+
+IPayloadBoards {
+  type: string;
+  boards: IDatabaseBoard[];
+}
+
+IPayloadTask {
+  type: string;
+  task: IDatabaseTask;
+  stateAccess: IStateAccess;
+}
+
+#############################################
+ACTION
+
+IUpdateTask {
+  task: IDatabaseTask;
+  stateAccess: IStateAccess;
+}

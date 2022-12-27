@@ -9,16 +9,24 @@ interface TProps {
   title?: string;
   text: string | undefined;
   entries: any;
-  changeDropdown: (option: string) => void;
+  changeDropdown: (option: any) => void;
 }
+
+const debug = 0;
 
 const Dropdown: React.FC<TProps> = ({ className, colors, title, text, entries, changeDropdown }) => {
   const [boxChecked, setBoxChecked] = useState(false);
+  let defVal;
 
-  const selectDropdown = (option: string) => {
+  const selectDropdown = (option: any) => {
     console.log(option);
     changeDropdown(option);
   };
+
+  entries.map((entry: any, i: any) => {
+    if (entry.name === text) defVal = i;
+  });
+  if (debug > 0) console.log('Dropdown/beforeRender: ', entries, text, defVal);
 
   return (
     <DropdownMain
@@ -31,12 +39,12 @@ const Dropdown: React.FC<TProps> = ({ className, colors, title, text, entries, c
       <select
         id="dropdown"
         name="Dropdown"
-        value={text}
+        value={defVal}
         onChange={(e) => selectDropdown(e.target.value)}
       >
         {entries.map((entry: any, i: any) => {
           return (
-            <option value={entry.name} key={i}>
+            <option value={i} key={i}>
               {entry.name}
             </option>
           );

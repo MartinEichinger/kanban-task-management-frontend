@@ -23,3 +23,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+Todo.xlsx
+src/store/api_JSON.ts
+src/store/taskSlices copy.ts
+src/store/data/datauser.json
+src/store/data/data.json
+~$Todo.xlsx

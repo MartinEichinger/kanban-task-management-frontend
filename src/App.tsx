@@ -1,12 +1,25 @@
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
+
 import { ReactComponent as Logo } from './images/logo-dark.svg';
 import { ReactComponent as LogoMobile } from './images/logo-mobile.svg';
 import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import { ReactComponent as ArrowDown } from './images/icon-chevron-down.svg';
 import { ReactComponent as ArrowUp } from './images/icon-chevron-up.svg';
 import { ReactComponent as Cross } from './images/icon-add-task-mobile.svg';
+
+import { useAppSelector, useAppDispatch } from './store/hooks';
+import {
+  getDatabaseEntries,
+  IUpdateTask,
+  IDatabaseBoard,
+  updateTask,
+  createTask,
+  createBoard,
+  updateBoard,
+  deleteItems,
+} from './store/taskSlices';
 
 import pointer from './images/pointer.png';
 import TaskModal from './TaskModal';
@@ -34,24 +47,6 @@ const colors = {
 };
 
 function App() {
-  type TDataProp = {
-    boards: {
-      name: string;
-      columns: {
-        name: string;
-        tasks: {
-          title: string;
-          description: string;
-          status: string;
-          subtasks: {
-            title: string;
-            isCompleted: boolean;
-          }[];
-        }[];
-      }[];
-    }[];
-  };
-
   const winRef = useRef<HTMLDivElement>(null);
 
   const [width, setWidth] = useState(winRef.current?.clientWidth);
@@ -65,8 +60,8 @@ function App() {
   const [showMenu, setShowMenu] = useState(false);
   const [mobilChevronDown, setMobilChevronDown] = useState(true);
 
-  const [data, setData] = useState<TDataProp>({} as TDataProp);
-  const [deleteTarget, setDeleteTarget] = useState('');
+  //const [data, setData] = useState<TDataProp>({} as TDataProp);
+  const [deleteTarget, setDeleteTarget] = useState(''); // board, task
   const [selectedBoard, setSelectedBoard] = useState(-1);
   const [editedBoard, setEditedBoard] = useState(-1);
   const [selectedCol, setSelectedCol] = useState(-1);
@@ -74,16 +69,22 @@ function App() {
   const [editedTask, setEditedTask] = useState(-1);
   const [sidebarCollapse, setSidebarCollapse] = useState(false);
 
-  const debug = 1;
+  const dispatch = useAppDispatch();
+
+  interface IBoardData {
+    boards: IDatabaseBoard | any;
+  }
+  var data: IBoardData = {
+    boards: [] as never,
+  };
+  data.boards = useAppSelector((state) => state.taskData.boards);
+
+  const debug = 2;
 
   useEffect(() => {
-    // Fetch JSON data
-    fetch('./data.json')
-      .then((response) => response.json())
-      .then((json) => {
-        console.log('App/useEffect: ', json);
-        setData(json);
-      });
+    // get directus data
+    dispatch(getDatabaseEntries());
+
     getWinSize();
     window.addEventListener('resize', getWinSize);
   }, []);
@@ -98,18 +99,25 @@ function App() {
     newWidth < 576 ? setSidebarCollapse(true) : setSidebarCollapse(false);
   };
 
-  const ResetData = () => {
+  const ResetData = (deleteTarget: string) => {
     setTaskModalShow(false);
     setNewTaskModalShow(false);
     setNewBoardModalShow(false);
     setDeleteModalShow(false);
     setShowMenu(false);
     setDeleteTarget('');
-    setSelectedBoard(-1);
-    setEditedBoard(-1);
-    setSelectedCol(-1);
-    setSelectedTask(-1);
-    setEditedTask(-1);
+    if (deleteTarget === 'board') {
+      setSelectedBoard(-1);
+      setEditedBoard(-1);
+      setSelectedCol(-1);
+      setSelectedTask(-1);
+      setEditedTask(-1);
+    } else {
+      // wenn 'task'
+      setSelectedCol(-1);
+      setSelectedTask(-1);
+      setEditedTask(-1);
+    }
     if (width !== undefined && width < 576) {
       setSidebarCollapse(true);
     } else {
@@ -119,6 +127,7 @@ function App() {
 
   const onClickMenu = (sel: string) => {
     setShowMenu(false);
+
     if (sel === 'edit') {
       handleBoardMenuSelection('edit', selectedBoard);
     } else {
@@ -181,139 +190,9 @@ function App() {
     setTaskModalShow(true);
   };
 
-  const ChangeData = (
-    operation: any,
-    selectedBoard: any,
-    selectedCol?: any,
-    selectedTask?: any,
-    selectedSubtask?: any,
-    val?: any
-  ) => {
-    console.log('changeData: ', selectedBoard, selectedCol, selectedTask, selectedSubtask, val);
-    const obj = { ...data };
-    console.log('start obj: ', obj);
-    // status of subtask
-    if (operation === 'subtask') {
-      obj.boards[selectedBoard].columns[selectedCol].tasks[selectedTask].subtasks[
-        selectedSubtask
-      ].isCompleted = val;
-      setData(obj);
-    } else if (operation === 'task') {
-      setTaskModalShow(false);
-      // assign new status to selected task
-      obj.boards[selectedBoard].columns[selectedCol].tasks[selectedTask].status = val;
-      console.log('obj 1: ', obj);
-      // copy selected task
-      var cut = obj.boards[selectedBoard].columns[selectedCol].tasks[selectedTask];
-      console.log('cut 2: ', cut);
-      // delete selected task from column
-      obj.boards[selectedBoard].columns[selectedCol].tasks.splice(selectedTask, 1);
-      console.log('obj 3: ', obj);
-      // push selected task to new column
-      obj.boards[selectedBoard].columns.map((col) => {
-        if (col.name === val) {
-          col.tasks.push(cut);
-        }
-      });
-      console.log('end obj: ', obj);
-      setData(obj);
-    } else if (operation === 'delete-task') {
-      obj.boards[selectedBoard].columns[selectedCol].tasks.splice(selectedTask, 1);
-      setDeleteModalShow(false);
-    } else if (operation === 'delete-board') {
-      obj.boards.splice(selectedBoard, 1);
-      setDeleteModalShow(false);
-      ResetData();
-    }
-  };
-
-  const AddNewTask = (
-    title: string,
-    description: string,
-    subtasks: any,
-    status: string,
-    edit: number[]
-  ) => {
-    // copy data -> when edit task: change values for title, descr, status and subtasks (differ between changed and new subtasks) -> write new data
-    // copy data -> when new task: generate newTask obj -> copy newTask into correct column -> write new data
-    if (debug >= 1) console.log('App/AddNewTask/in: ', title, description, subtasks, status);
-    var newDataList = data;
-
-    if (edit[2] > -1) {
-      newDataList.boards[edit[0]].columns[edit[1]].tasks[edit[2]].title = title;
-      newDataList.boards[edit[0]].columns[edit[1]].tasks[edit[2]].description = description;
-      newDataList.boards[edit[0]].columns[edit[1]].tasks[edit[2]].status = status;
-      newDataList.boards[edit[0]].columns[edit[1]].tasks[edit[2]].subtasks.map((task, i) => {
-        return (task.title = subtasks[i]);
-      });
-      for (
-        let i = newDataList.boards[edit[0]].columns[edit[1]].tasks[edit[2]].subtasks.length;
-        i < subtasks.length;
-        i++
-      ) {
-        newDataList.boards[edit[0]].columns[edit[1]].tasks[edit[2]].subtasks.push({
-          title: subtasks[i],
-          isCompleted: false,
-        });
-      }
-    } else {
-      var newTask = {
-        title: title,
-        description: description,
-        status: status,
-        subtasks: subtasks.map((subtask: any, i: any) => {
-          return {
-            title: subtask,
-            isCompleted: false,
-          };
-        }),
-      };
-      console.log('App/AddNewTask/task: ', newTask);
-      newDataList.boards[selectedBoard].columns.map((colName, i) => {
-        if (colName.name === status) {
-          return newDataList.boards[selectedBoard].columns[i].tasks.push(newTask);
-        }
-      });
-    }
-
-    console.log('App/AddNewTask/data: ', newDataList);
-    setData(newDataList);
-    setEditedTask(-1);
-    setNewTaskModalShow(false);
-  };
-
-  const AddNewBoard = (title: string, columns: any, edit: number) => {
-    if (debug >= 1) console.log('App/AddNewBoard/in: ', title, columns, edit);
-    var newDataList = data;
-    if (edit > -1) {
-      newDataList.boards[edit].name = title;
-      newDataList.boards[edit].columns.map((col, i) => {
-        return (col.name = columns[i]);
-      });
-      for (let i = newDataList.boards[edit].columns.length; i < columns.length; i++) {
-        newDataList.boards[edit].columns.push({ name: columns[i], tasks: [] });
-      }
-    } else {
-      var newBoard = {
-        name: title,
-        columns: columns.map((col: any, i: any) => {
-          return {
-            name: col,
-            tasks: [],
-          };
-        }),
-      };
-      console.log('App/AddNewBoard/cols: ', newBoard);
-
-      newDataList.boards.push(newBoard);
-    }
-    console.log('App/AddNewBoard/data: ', newDataList);
-    setData(newDataList);
-    setNewBoardModalShow(false);
-  };
-
   const RenderContent = () => {
-    var obj = data.boards[selectedBoard];
+    var obj = (data as any).boards[selectedBoard];
+    if (debug > 0) console.log('App/RenderContent: ', obj);
 
     return (
       <Columns
@@ -321,7 +200,7 @@ function App() {
         colors={colors}
         pointer={pointer}
       >
-        {obj.columns?.map((item, i) => {
+        {obj.columns?.map((item: any, i: any) => {
           return (
             <div className="column d-flex flex-column" key={i}>
               <h4 className="d-flex flex-row align-items-center">
@@ -329,9 +208,9 @@ function App() {
                 {item.name} ({item.tasks.length})
               </h4>
               <div className="col-body">
-                {item.tasks.map((task, j) => {
-                  var completed = task.subtasks.filter((subtask) => {
-                    return subtask.isCompleted === true;
+                {item.tasks.map((task: any, j: any) => {
+                  var completed = task.subtasks.filter((subtask: any) => {
+                    return subtask.isCompleted === 1;
                   });
                   return (
                     <Task
@@ -366,32 +245,37 @@ function App() {
     );
   };
 
+  if (debug > 0) console.log('App/beforeRender: ', data);
   return (
     <div className="App" ref={winRef}>
       <div className="frame d-flex flex-column">
         <Nav className="nav d-flex flex-row" colors={colors} pointer={pointer}>
-          <div className="d-none d-sm-block logo" onClick={ResetData}>
+          <div className="d-none d-sm-block logo" onClick={() => ResetData('board')}>
             <Logo />
           </div>
           <div className="navbar d-flex flex-row justify-content-around">
-            <LogoMobile className="d-flex d-sm-none mr-3 pointer" onClick={ResetData} />
+            <LogoMobile className="d-flex d-sm-none mr-3 pointer" onClick={() => ResetData('board')} />
             <h1 className="mr-sm-auto mr-2">
-              {selectedBoard > -1 ? data.boards?.[selectedBoard]?.name : '...board'}
+              {selectedBoard > -1 ? (data as any).boards?.[selectedBoard]?.name : '...board'}
             </h1>
-            <ArrowDown
-              className={mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
-              onClick={() => {
-                setMobilChevronDown(!mobilChevronDown);
-                setShowSidebarMenu(true);
-              }}
-            />
-            <ArrowUp
-              className={!mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
-              onClick={() => {
-                setMobilChevronDown(!mobilChevronDown);
-                setShowSidebarMenu(false);
-              }}
-            />
+            {width !== undefined && width < 576 && (
+              <>
+                <ArrowDown
+                  className={mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
+                  onClick={() => {
+                    setMobilChevronDown(!mobilChevronDown);
+                    setShowSidebarMenu(true);
+                  }}
+                />
+                <ArrowUp
+                  className={!mobilChevronDown ? 'pointer mr-auto' : 'd-none'}
+                  onClick={() => {
+                    setMobilChevronDown(!mobilChevronDown);
+                    setShowSidebarMenu(false);
+                  }}
+                />
+              </>
+            )}
             <button
               className="btn large prim"
               id="add-task"
@@ -454,14 +338,17 @@ function App() {
         colors={colors}
         show={taskModalShow}
         onHide={() => setTaskModalShow(false)}
-        boards={data}
+        boards={data.boards}
         selection={{
           selectedBoard: selectedBoard,
           selectedCol: selectedCol,
           selectedTask: selectedTask,
         }}
-        changeData={ChangeData}
         handleMenuSelection={handleTaskMenuSelection}
+        changeData={(val: IUpdateTask) => {
+          dispatch(updateTask(val));
+          setTaskModalShow(false);
+        }}
       />
       <NewTaskModal
         colors={colors}
@@ -470,10 +357,15 @@ function App() {
           setNewTaskModalShow(false);
           setEditedTask(-1);
         }}
-        entriesSelect={selectedBoard > -1 && data.boards[selectedBoard].columns}
+        entriesSelect={selectedBoard > -1 && (data as any).boards[selectedBoard]?.columns}
         edit={[selectedBoard, selectedCol, editedTask]}
         data={data}
-        changeData={AddNewTask}
+        changeData={(val: any) => {
+          console.log('App/NewTaskModal: ', val);
+          editedTask > -1 ? dispatch(updateTask(val)) : dispatch(createTask(val));
+          setEditedTask(-1);
+          setNewTaskModalShow(false);
+        }}
       />
       <NewBoardModal
         colors={colors}
@@ -483,7 +375,15 @@ function App() {
           setNewBoardModalShow(false);
           setEditedBoard(-1);
         }}
-        changeData={AddNewBoard}
+        changeData={(val: any) => {
+          var id = data.boards?.[selectedBoard]?.id;
+          if (val.edit > -1) {
+            dispatch(updateBoard({ id: id, name: val.title, columns: val.columns }));
+          } else {
+            dispatch(createBoard({ id: '', name: val.title, columns: val.columns }));
+          }
+          setNewBoardModalShow(false);
+        }}
         edit={editedBoard}
         data={data}
       />
@@ -497,11 +397,30 @@ function App() {
         selection={{ selectedBoard, selectedCol, selectedTask }}
         title={
           deleteTarget === 'board'
-            ? data.boards?.[selectedBoard]?.name
-            : data.boards?.[selectedBoard]?.columns?.[selectedCol]?.tasks[selectedTask]?.title
+            ? (data as any).boards?.[selectedBoard]?.name
+            : (data as any).boards?.[selectedBoard]?.columns?.[selectedCol]?.tasks[selectedTask]?.title
         }
         target={deleteTarget}
-        onDelete={ChangeData}
+        onDelete={(val: any) => {
+          console.log(val);
+          deleteTarget === 'board'
+            ? dispatch(
+                deleteItems({
+                  id: (data as any).boards[selectedBoard].id,
+                  arrNo: val.selectedBoard,
+                  val: val,
+                })
+              )
+            : dispatch(
+                deleteItems({
+                  id: (data as any).boards[selectedBoard].columns[selectedCol].tasks[selectedTask].id,
+                  arrNo: val.selectedTask,
+                  val: val,
+                })
+              );
+          setDeleteModalShow(false);
+          ResetData(deleteTarget);
+        }}
       />
       <SidebarMenuModal
         colors={colors}
@@ -520,7 +439,11 @@ function App() {
           setMobilChevronDown(!mobilChevronDown);
         }}
         setEditedBoard={setEditedBoard}
-        setNewBoardModalShow={setNewBoardModalShow}
+        setNewBoardModalShow={(val: boolean) => {
+          setShowSidebarMenu(false);
+          setMobilChevronDown(!mobilChevronDown);
+          setNewBoardModalShow(val);
+        }}
         ToggleSidebarCollapse={ToggleSidebarCollapse}
       />
     </div>
