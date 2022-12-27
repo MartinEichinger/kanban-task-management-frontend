@@ -18,6 +18,10 @@ const toasty = (store) => (next) => (action) => {
     toast.error(`${action.payload.error}`);
   } else if (action.type === 'taskData/boardCreated') {
     toast.success(`Board "${action.payload.props.name}" created`);
+  } else if (action.type === 'taskData/taskDeleted') {
+    toast.warning(`Task deleted`);
+  } else if (action.type === 'taskData/boardDeleted') {
+    toast.warning(`Board deleted`);
   }
 
   return next(action);
