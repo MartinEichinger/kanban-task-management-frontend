@@ -569,6 +569,7 @@ export const createBoard =
     if (data.error) {
       dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
     } else {
+      actionType = 'taskData/boardCreated';
       // Load data to store
       dispatch(
         boardCreated({

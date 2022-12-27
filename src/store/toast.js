@@ -13,9 +13,11 @@ const toasty = (store) => (next) => (action) => {
   } else if (action.type === 'auth/loggedOut') {
     toast.success('Logout erfolgreich');
   } else if (action.type === 'taskData/itemsReceived') {
-    toast.success('Datenbank Daten geladen');
+    toast.success('Database data loaded');
   } else if (action.type === 'taskData/itemsRequestFailed') {
     toast.error(`${action.payload.error}`);
+  } else if (action.type === 'taskData/boardCreated') {
+    toast.success(`Board "${action.payload.props.name}" created`);
   }
 
   return next(action);
