@@ -16,6 +16,7 @@ export async function getData(queryScheme: any, type: any) {
     .catch(async () => {
       // Let's login in case we don't have token or it is invalid / expired
       while (!authenticated) {
+        console.log(envEmail, envPwd);
         await directus.auth
           .login({ email: envEmail, password: envPwd })
           .then(() => {
