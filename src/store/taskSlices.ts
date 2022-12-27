@@ -63,6 +63,10 @@ interface IPayloadTask {
   stateAccess: IStateAccess;
 }
 
+interface IPayloadError {
+  error: any;
+}
+
 // ACTIONS
 export interface IUpdateTask {
   stateAccess: IStateAccess;
@@ -320,8 +324,8 @@ export const slice = createSlice({
     },
 
     // onError
-    itemsRequestFailed: (state) => {
-      if (debug > 0) console.log('task/taksRequestFailed');
+    itemsRequestFailed: (state, action: PayloadAction<IPayloadError>) => {
+      if (debug > 0) console.log('task/taksRequestFailed', action.payload?.error);
       state.loading = false;
     },
   },
@@ -348,7 +352,7 @@ export const getDatabaseEntries = (): AppThunk => async (dispatch) => {
   if (debug > 0) console.log('task/getTasks');
 
   // prepare action
-  let actionType = 'task/requestDatabaseEntries';
+  let actionType = 'taskData/itemsReceived';
   let queryScheme = `
   query {
     boards {
@@ -376,11 +380,17 @@ export const getDatabaseEntries = (): AppThunk => async (dispatch) => {
   dispatch(itemsRequested({ type: actionType }));
 
   // Perform Request
-  let res = await getData(queryScheme, queryType); //searchUrl, headers, formData.method);
+  let data = await getData(queryScheme, queryType); //searchUrl, headers, formData.method);
+  console.log('taskSlices/getDBEntries: ', data);
 
-  // Load data to store
-  actionType = 'task/receivedDatabaseEntries';
-  dispatch(itemsReceived({ boards: (res as any).boards, type: actionType }));
+  // send error due to failed get
+  if (data.error) {
+    dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
+  } else {
+    // Load data to store
+    actionType = 'taskData/itemsRequested';
+    dispatch(itemsReceived({ boards: (data as any).boards, type: actionType }));
+  }
 };
 
 export const createTask =
@@ -426,17 +436,22 @@ export const createTask =
     }`;
     var data = await getData(queryScheme, 'item');
 
-    // Load data to store
-    dispatch(
-      taskCreated({
-        type: __actionType,
-        task: {
-          ...data.create_kanban_tasks_item,
-          status,
-        },
-        stateAccess,
-      })
-    );
+    // send error due to failed get
+    if (data.error) {
+      dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
+    } else {
+      // Load data to store
+      dispatch(
+        taskCreated({
+          type: __actionType,
+          task: {
+            ...data.create_kanban_tasks_item,
+            status,
+          },
+          stateAccess,
+        })
+      );
+    }
   };
 
 export const updateTask =
@@ -498,17 +513,22 @@ export const updateTask =
     }`;
     var data = await getData(__queryScheme, 'item');
 
-    // Load data to store
-    dispatch(
-      taskUpdated({
-        type: __actionType,
-        task: {
-          ...data.update_kanban_tasks_item,
-          status: { id: __col_id, name: __col_name },
-        },
-        stateAccess,
-      })
-    );
+    // send error due to failed get
+    if (data.error) {
+      dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
+    } else {
+      // Load data to store
+      dispatch(
+        taskUpdated({
+          type: __actionType,
+          task: {
+            ...data.update_kanban_tasks_item,
+            status: { id: __col_id, name: __col_name },
+          },
+          stateAccess,
+        })
+      );
+    }
   };
 
 export const createBoard =
@@ -544,13 +564,18 @@ export const createBoard =
     }`;
     var data = await getData(queryScheme, 'item');
 
-    // Load data to store
-    dispatch(
-      boardCreated({
-        type: actionType,
-        props: data.create_boards_item,
-      })
-    );
+    // send error due to failed get
+    if (data.error) {
+      dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
+    } else {
+      // Load data to store
+      dispatch(
+        boardCreated({
+          type: actionType,
+          props: data.create_boards_item,
+        })
+      );
+    }
   };
 
 export const updateBoard =
@@ -584,13 +609,18 @@ export const updateBoard =
     }`;
     var data = await getData(queryScheme, 'item');
 
-    // Load data to store
-    dispatch(
-      boardUpdated({
-        type: actionType,
-        props: data.update_boards_item,
-      })
-    );
+    // send error due to failed get
+    if (data.error) {
+      dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
+    } else {
+      // Load data to store
+      dispatch(
+        boardUpdated({
+          type: actionType,
+          props: data.update_boards_item,
+        })
+      );
+    }
   };
 
 type TaTDI = {
@@ -631,12 +661,17 @@ export const deleteItems =
     }`;
     var data = await getData(queryScheme, 'item');
 
-    // Load data to store
-    var fctLoad = {
-      type: actionType,
-      props: { ...data[queryOperation], arrNo: arrNo, val: val },
-    };
-    actionType === 'board/deleteBoard'
-      ? dispatch(boardDeleted(fctLoad))
-      : dispatch(taskDeleted(fctLoad));
+    // send error due to failed get
+    if (data.error) {
+      dispatch(itemsRequestFailed({ error: data.error.errors[0].message }));
+    } else {
+      // Load data to store
+      var fctLoad = {
+        type: actionType,
+        props: { ...data[queryOperation], arrNo: arrNo, val: val },
+      };
+      actionType === 'board/deleteBoard'
+        ? dispatch(boardDeleted(fctLoad))
+        : dispatch(taskDeleted(fctLoad));
+    }
   };

@@ -12,6 +12,10 @@ const toasty = (store) => (next) => (action) => {
     toast.success(`Login erfolgreich`);
   } else if (action.type === 'auth/loggedOut') {
     toast.success('Logout erfolgreich');
+  } else if (action.type === 'taskData/itemsReceived') {
+    toast.success('Datenbank Daten geladen');
+  } else if (action.type === 'taskData/itemsRequestFailed') {
+    toast.error(`${action.payload.error}`);
   }
 
   return next(action);

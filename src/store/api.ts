@@ -8,25 +8,28 @@ export async function getData(queryScheme: any, type: any) {
   //url: string, headers: any, method: string): Promise<any> {
   let authenticated = false;
   // Try to authenticate with token if exists
-  await directus.auth
+  var auth = await directus.auth
     .refresh()
     .then(() => {
       authenticated = true;
     })
     .catch(async () => {
       // Let's login in case we don't have token or it is invalid / expired
-      while (!authenticated) {
-        await directus.auth
-          .login({ email: envEmail, password: envPwd })
-          .then(() => {
-            authenticated = true;
-          })
-          .catch((error) => {
-            console.log(error);
-            return error;
-          });
-      }
+      //while (!authenticated) {
+      return await directus.auth
+        .login({ email: envEmail, password: envPwd })
+        .then(() => {
+          authenticated = true;
+        })
+        .catch((error) => {
+          console.log('Error: ', error);
+          return error;
+        });
+      //}
     });
+  console.log('auth: ', auth);
+  // interrupt request due to failed auth
+  if (auth !== undefined) return { error: auth };
 
   console.log('run query: ', queryScheme);
   let response;
