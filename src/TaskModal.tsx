@@ -60,6 +60,7 @@ const TaskModal: React.FC<TModalProp> = (props) => {
   const dispatch = useAppDispatch();
 
   const [showMenu, setShowMenu] = useState(false);
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
 
   if (debug >= 1) console.log('CustomModal ', props, selectedBoard, selectedCol, selectedTask);
   if (debug >= 2 && selectedBoard > -1 && selectedCol > -1 && selectedTask > -1) {
@@ -81,6 +82,7 @@ const TaskModal: React.FC<TModalProp> = (props) => {
   return (
     <TaskModalMain
       colors={props.colors}
+      darkModus={darkModus}
       show={props.show}
       onHide={props.onHide}
       size="lg"
@@ -173,6 +175,7 @@ export default TaskModal;
 
 type TNavProp = {
   colors: any;
+  darkModus?: any;
 };
 
 type TShowProp = {
@@ -233,6 +236,28 @@ const EllipsisBody = styled.div<TNavProp & TPointerProp>`
 `;
 
 const TaskModalMain = styled(Modal)<TNavProp>`
+  .modal-content {
+    border: 0px;
+  }
+
+  .modal-header {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+
+    .modal-title {
+      color: ${({ colors, darkModus }) => (!darkModus ? colors.black : colors.white)};
+    }
+  }
+
+  .modal-body {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+    border-bottom-left-radius: var(--bs-modal-inner-border-radius);
+    border-bottom-right-radius: var(--bs-modal-inner-border-radius);
+
+    .bold {
+      color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.medium_grey)};
+    }
+  }
+
   p {
     color: ${({ colors }) => colors.medium_grey};
   }

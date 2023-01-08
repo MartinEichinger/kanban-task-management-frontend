@@ -107,6 +107,11 @@ body #root button.small.second,
   background-color: rgba(99, 95, 199, 0.1);
   color: rgb(99, 95, 199);
 }
+body #root button.small.second.dark-modus,
+.fade.modal button.small.second.dark-modus {
+  background-color: rgb(255, 255, 255);
+  color: rgb(99, 95, 199);
+}
 body #root button.small.second:hover,
 .fade.modal button.small.second:hover {
   background-color: rgba(99, 95, 199, 0.25);

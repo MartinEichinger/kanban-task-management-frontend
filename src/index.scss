@@ -5,6 +5,7 @@ $main_purple_light: rgba(99, 95, 199, 0.1);
 $main_purple_light_hover: rgba(99, 95, 199, 0.25);
 $red: rgba(234, 85, 85, 1);
 $red_hover: rgba(255, 152, 152, 1);
+$white: rgba(255, 255, 255, 1);
 
 body #root,
 .fade.modal {
@@ -115,6 +116,11 @@ body #root,
       &.second {
         background-color: $main_purple_light;
         color: $main_purple;
+
+        &.dark-modus {
+          background-color: $white;
+          color: $main_purple;
+        }
 
         &:hover {
           background-color: $main_purple_light_hover;

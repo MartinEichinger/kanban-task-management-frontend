@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
+import { useAppSelector } from './store/hooks';
 import Modal from 'react-bootstrap/Modal';
 import Textfield from './Textfield';
 import Textarea from './Textarea';
@@ -24,6 +25,7 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
   const [subtasks, setSubtasks] = useState([{ id: '', title: '', isCompleted: 0 }]);
   const [status, setStatus] = useState({ id: props.entriesSelect[0], name: props.entriesSelect[0] }); // number of entriesSelect
 
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
   const debug = 0;
 
   var subtasksEntries = props.data.boards?.[props.edit[0]]?.columns[props.edit[1]]?.tasks[
@@ -105,6 +107,7 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
   return (
     <TaskModalMain
       colors={props.colors}
+      darkModus={darkModus}
       show={props.show}
       onHide={props.onHide}
       size="lg"
@@ -182,6 +185,7 @@ export default NewTaskModal;
 
 type TNavProp = {
   colors: any;
+  darkModus?: any;
 };
 
 const DropdownNTM = styled(Dropdown)`
@@ -201,6 +205,22 @@ const MultitaskfieldNTM = styled(Multitaskfield)`
 `;
 
 const TaskModalMain = styled(Modal)<TNavProp>`
+  .modal-content {
+    border: 0px;
+    outline: 0px;
+  }
+
+  .modal-header {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)};
+  }
+
+  .modal-body {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+    border-bottom-left-radius: var(--bs-modal-inner-border-radius);
+    border-bottom-right-radius: var(--bs-modal-inner-border-radius);
+  }
+
   p {
     color: ${({ colors }) => colors.medium_grey};
   }

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
+import { useAppSelector } from './store/hooks';
 import Modal from 'react-bootstrap/Modal';
 import pointer from './images/pointer.png';
 
@@ -23,10 +24,12 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
   const debug = 0;
 
   var { selectedBoard, selectedCol, selectedTask } = props.selection;
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
 
   return (
     <DeleteModalMain
       colors={props.colors}
+      darkModus={darkModus}
       pointer={pointer}
       show={props.show}
       onHide={props.onHide}
@@ -62,7 +65,10 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
           >
             Delete
           </button>
-          <button className="btn small second w-100" onClick={props.onHide}>
+          <button
+            className={darkModus ? 'btn small second dark-modus w-100' : 'btn small second w-100'}
+            onClick={props.onHide}
+          >
             Cancel
           </button>
         </div>
@@ -75,6 +81,7 @@ export default DeleteModal;
 
 type TNavProp = {
   colors: any;
+  darkModus?: any;
 };
 
 type TPointerProp = {
@@ -82,6 +89,20 @@ type TPointerProp = {
 };
 
 const DeleteModalMain = styled(Modal)<TNavProp & TPointerProp>`
+  .modal-content {
+    border: 0px;
+  }
+
+  .modal-header {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+  }
+
+  .modal-body {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+    border-bottom-left-radius: var(--bs-modal-inner-border-radius);
+    border-bottom-right-radius: var(--bs-modal-inner-border-radius);
+  }
+
   .red {
     color: ${({ colors }) => colors.red};
   }

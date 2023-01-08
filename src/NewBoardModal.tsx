@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useAppSelector } from './store/hooks';
 import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
 import Textfield from './Textfield';
@@ -19,6 +20,7 @@ interface TModalProp {
 const NewBoardModal: React.FC<TModalProp> = (props) => {
   const [title, setTitle] = useState('');
   const [columns, setColumns] = useState([{ id: '', name: '' }]);
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
 
   const debug = 0;
 
@@ -56,6 +58,7 @@ const NewBoardModal: React.FC<TModalProp> = (props) => {
   return (
     <BoardModalMain
       colors={props.colors}
+      darkModus={darkModus}
       show={props.show}
       onHide={props.onHide}
       size="lg"
@@ -128,6 +131,21 @@ const MultitaskfieldNTM = styled(Multitaskfield)`
 `;
 
 const BoardModalMain = styled(Modal)<TNavProp>`
+  .modal-content {
+    border: 0px;
+  }
+
+  .modal-header {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)};
+  }
+
+  .modal-body {
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
+    border-bottom-left-radius: var(--bs-modal-inner-border-radius);
+    border-bottom-right-radius: var(--bs-modal-inner-border-radius);
+  }
+
   p {
     color: ${({ colors }) => colors.medium_grey};
   }

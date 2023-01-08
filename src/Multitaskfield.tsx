@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
+import { useAppSelector } from './store/hooks';
 import Textfield from './Textfield';
 import { ReactComponent as Cross } from './icon-cross.svg';
 
@@ -29,6 +30,7 @@ const Multitaskfield: React.FC<IMultitaskfield> = ({
   if (debug >= 1) console.log('Multitaskfield: ', title, placeholder, values);
   const placeholderList = placeholder;
   const [taskList, setTaskList] = useState(values);
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
 
   useEffect(() => {
     if (debug >= 2) console.log('Multitaskfield/useEffect: ', values);
@@ -67,7 +69,7 @@ const Multitaskfield: React.FC<IMultitaskfield> = ({
 
   if (debug >= 1) console.log('Multitaskfield/beforeRender: ', taskList);
   return (
-    <MultitaskfieldMain colors={colors} className={className}>
+    <MultitaskfieldMain colors={colors} darkModus={darkModus} className={className}>
       <label htmlFor="Textarea">{title}</label>
 
       {taskList.map((item, i) => {
@@ -83,7 +85,10 @@ const Multitaskfield: React.FC<IMultitaskfield> = ({
           </div>
         );
       })}
-      <button className="small second w-100" onClick={() => AddRemoveSubTask(-1)}>
+      <button
+        className={darkModus ? 'small second dark-modus w-100' : 'small second w-100'}
+        onClick={() => AddRemoveSubTask(-1)}
+      >
         + Add New {title.slice(0, -1)}
       </button>
     </MultitaskfieldMain>
@@ -94,6 +99,7 @@ export default Multitaskfield;
 
 type TNavProp = {
   colors: any;
+  darkModus?: any;
 };
 
 const CrossMTF = styled(Cross)`
@@ -106,7 +112,7 @@ const MultitaskfieldMain = styled.div<TNavProp>`
     font-size: 12px;
     font-weight: 700;
     line-height: 15px;
-    color: ${({ colors }) => colors.medium_grey};
+    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.medium_grey)};
     margin-bottom: 8px;
   }
 

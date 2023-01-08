@@ -1,5 +1,6 @@
 import { configureStore, Action } from '@reduxjs/toolkit';
 import taskDataReducer from './taskSlices';
+import darkModusReducer from './darkModusSlices';
 
 import logger from './logger';
 import toast from './toast';
@@ -9,6 +10,7 @@ import { ThunkAction } from 'redux-thunk';
 export const store = configureStore({
   reducer: {
     taskData: taskDataReducer,
+    darkModus: darkModusReducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger, toast),
 });

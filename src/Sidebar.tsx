@@ -1,8 +1,11 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 import pointer from './images/pointer.png';
+import ToggleDarkModus from './ToggleDarkModus';
 import { ReactComponent as SidebarIcon } from './images/icon-board.svg';
 import { ReactComponent as HideIcon } from './images/icon-hide-sidebar.svg';
+import { useAppSelector, useAppDispatch } from './store/hooks';
+import { setDarkModus } from './store/darkModusSlices';
 
 interface TProps {
   className?: string;
@@ -27,6 +30,9 @@ const Sidebar: React.FC<TProps> = ({
   setNewBoardModalShow,
   ToggleSidebarCollapse,
 }) => {
+  const dispatch = useAppDispatch();
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+
   return (
     <SidebarMain
       className={
@@ -36,6 +42,7 @@ const Sidebar: React.FC<TProps> = ({
       }
       colors={colors}
       pointer={pointer}
+      darkModus={darkModus}
     >
       <div className="upper d-flex flex-column">
         <h3 className="sidebar-heading">ALL BOARDS ({data.boards?.length})</h3>
@@ -67,6 +74,17 @@ const Sidebar: React.FC<TProps> = ({
         </div>
       </div>
       <div className="lower d-none d-sm-flex flex-column">
+        {!sidebarCollapse && (
+          <ToggleDarkModusSB
+            className="toggle-dark-modus"
+            colors={colors}
+            darkModus={darkModus}
+            onChange={(e: any) => {
+              console.log(e, e.target.checked);
+              dispatch(setDarkModus({ modus: e.target.checked }));
+            }}
+          />
+        )}
         <div
           className={
             sidebarCollapse
@@ -87,6 +105,7 @@ export default Sidebar;
 
 type TColorProp = {
   colors: any;
+  darkModus?: any;
 };
 
 type TPointerProp = {
@@ -95,8 +114,14 @@ type TPointerProp = {
 
 const SidebarMain = styled.div<TColorProp & TPointerProp>`
   width: 300px;
-  margin-bottom: 32px;
-  border-right: 1px solid ${({ colors }) => colors.lines_light};
+  padding-bottom: 80px;
+  border-right: 1px solid
+    ${({ colors, darkModus }) => {
+      return darkModus ? colors.lines_dark : colors.lines_light;
+    }};
+  background-color: ${({ colors, darkModus }) => {
+    return darkModus ? colors.dark_grey : colors.white;
+  }};
 
   &.collapsed {
     width: 0px;
@@ -104,6 +129,9 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
 
   .sidebar-heading {
     padding: 14px 93px 15px 32px;
+    color: ${({ colors, darkModus }) => {
+      return darkModus ? colors.medium_grey : colors.black;
+    }};
   }
 
   .nav-item {
@@ -184,4 +212,10 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
       }
     }
   }
+`;
+
+const ToggleDarkModusSB = styled(ToggleDarkModus)<TColorProp>`
+  background-color: ${({ colors, darkModus }) => {
+    return darkModus ? colors.very_dark_grey : colors.light_grey;
+  }};
 `;

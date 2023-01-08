@@ -2,7 +2,8 @@ import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
 
-import { ReactComponent as Logo } from './images/logo-dark.svg';
+import { ReactComponent as LogoDark } from './images/logo-dark.svg';
+import { ReactComponent as LogoLight } from './images/logo-light.svg';
 import { ReactComponent as LogoMobile } from './images/logo-mobile.svg';
 import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
 import { ReactComponent as ArrowDown } from './images/icon-chevron-down.svg';
@@ -31,6 +32,7 @@ import Sidebar from './Sidebar';
 
 const colors = {
   lines_light: 'rgba(228,235,250,1)',
+  lines_dark: 'rgba(62,63,78,1)',
   main_purple: 'rgba(99, 95, 199, 1)',
   main_purple25: 'rgba(99, 95, 199, 0.25)',
   main_purple10: 'rgba(99, 95, 199, 0.1)',
@@ -41,9 +43,20 @@ const colors = {
   medium_grey25: 'rgba(130,143,163,0.25)',
   light_grey: 'rgba(244,247,253,1)',
   lighter_grey: 'rgba(233, 239, 250, 1)',
+  dark_grey: 'rgba(43,44,55,1)',
+  very_dark_grey: 'rgba(32,33,44,1)',
+  white: 'rgba(255,255,255,1)',
+  white50: 'rgba(255,255,255,0.5)',
+  white25: 'rgba(255,255,255,0.25)',
   red: 'rgba(234,85,85,1)',
   black: 'rgba(0,1,18,1)',
   black50: 'rgba(0,1,18,0.5)',
+};
+interface IBoardData {
+  boards: IDatabaseBoard | any;
+}
+var data: IBoardData = {
+  boards: [] as never,
 };
 
 function App() {
@@ -70,14 +83,8 @@ function App() {
   const [sidebarCollapse, setSidebarCollapse] = useState(false);
 
   const dispatch = useAppDispatch();
-
-  interface IBoardData {
-    boards: IDatabaseBoard | any;
-  }
-  var data: IBoardData = {
-    boards: [] as never,
-  };
   data.boards = useAppSelector((state) => state.taskData.boards);
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
 
   const debug = 0;
 
@@ -199,6 +206,7 @@ function App() {
         className="d-flex flex-row justify-content-start align-items-start"
         colors={colors}
         pointer={pointer}
+        darkModus={darkModus}
       >
         {obj.columns?.map((item: any, i: any) => {
           return (
@@ -220,6 +228,7 @@ function App() {
                       key={j}
                       pointer={pointer}
                       colors={colors}
+                      darkModus={darkModus}
                     >
                       <h3>{task.title}</h3>
                       <p className="bold">
@@ -249,9 +258,9 @@ function App() {
   return (
     <div className="App" ref={winRef}>
       <div className="frame d-flex flex-column">
-        <Nav className="nav d-flex flex-row" colors={colors} pointer={pointer}>
+        <Nav className="nav d-flex flex-row" colors={colors} pointer={pointer} darkModus={darkModus}>
           <div className="d-none d-sm-block logo" onClick={() => ResetData('board')}>
-            <Logo />
+            {!darkModus ? <LogoDark /> : <LogoLight />}
           </div>
           <div className="navbar d-flex flex-row justify-content-around">
             <LogoMobile className="d-flex d-sm-none mr-3 pointer" onClick={() => ResetData('board')} />
@@ -315,7 +324,12 @@ function App() {
             ToggleSidebarCollapse={ToggleSidebarCollapse}
           />
 
-          <Content colors={colors} pointer={pointer} className={sidebarCollapse ? 'collapsed' : ''}>
+          <Content
+            colors={colors}
+            darkModus={darkModus}
+            pointer={pointer}
+            className={sidebarCollapse ? 'collapsed' : ''}
+          >
             {selectedBoard > -1 ? (
               <div className="content d-flex flex-column justify-content-start align-items-start">
                 <RenderContent />
@@ -449,6 +463,7 @@ export default App;
 
 type TColorProp = {
   colors: any;
+  darkModus?: any;
 };
 
 type TPointerProp = {
@@ -526,7 +541,9 @@ const Columns = styled.div<TNavProp>`
 
     &.add-col {
       border-radius: 6px;
-      background-color: ${({ colors }) => colors.lighter_grey};
+      background-color: ${({ colors, darkModus }) => {
+        return darkModus ? colors.dark_grey : colors.lighter_grey;
+      }};
       height: calc(100% - 62px);
       margin-top: 50px;
 
@@ -582,8 +599,11 @@ const Columns = styled.div<TNavProp>`
   }
 `;
 
-const Task = styled.button<TNavProp>`
-  background-color: white;
+const Task = styled.button<TColorProp & TNavProp>`
+  background-color: ${({ colors, darkModus }) => {
+    return darkModus ? colors.dark_grey : colors.white;
+  }};
+
   border-radius: 8px;
   padding: 23px 16px;
   margin-bottom: 20px;
@@ -594,7 +614,9 @@ const Task = styled.button<TNavProp>`
   &:focus-visible,
   &:active,
   &:focus {
-    background-color: white;
+    background-color: ${({ colors, darkModus }) => {
+      return darkModus ? colors.dark_grey : colors.white;
+    }};
     cursor: url('${({ pointer }) => pointer}'), pointer;
     border: none;
     outline: none;
@@ -607,6 +629,9 @@ const Task = styled.button<TNavProp>`
 
   h3 {
     text-align: left;
+    color: ${({ colors, darkModus }) => {
+      return darkModus ? colors.white : colors.black;
+    }};
   }
 
   p {
@@ -619,17 +644,36 @@ const Task = styled.button<TNavProp>`
 const Nav = styled.div<TColorProp & TPointerProp>`
   .logo {
     padding: 35px 24px;
-    border: 1px solid ${({ colors }) => colors.lines_light};
+    border: 1px solid
+      ${({ colors, darkModus }) => {
+        return darkModus ? colors.lines_dark : colors.lines_light;
+      }};
     border-top: 0px;
+    border-left: 0px;
     width: 300px;
     cursor: url('${({ pointer }) => pointer}'), pointer;
+    background-color: ${({ colors, darkModus }) => {
+      return darkModus ? colors.dark_grey : colors.white;
+    }};
   }
 
   .navbar {
     padding: 29px 32px 37px;
-    border-bottom: 1px solid ${({ colors }) => colors.lines_light};
+    border-bottom: 1px solid
+      ${({ colors, darkModus }) => {
+        return darkModus ? colors.lines_dark : colors.lines_light;
+      }};
     border-top: 0px;
-    width: calc(100vw - 305px);
+    width: calc(100vw - 300px);
+    background-color: ${({ colors, darkModus }) => {
+      return darkModus ? colors.dark_grey : colors.white;
+    }};
+
+    h1 {
+      color: ${({ colors, darkModus }) => {
+        return darkModus ? colors.white : colors.black;
+      }};
+    }
 
     @media (max-width: 575px) {
       width: 100vw;
@@ -648,7 +692,7 @@ const Nav = styled.div<TColorProp & TPointerProp>`
 `;
 
 const Main = styled.div`
-  height: calc(100vh - 116px);
+  height: calc(100vh - 100px);
 
   @media (max-width: 575px) {
     height: calc(100vh - 67px);
@@ -656,9 +700,11 @@ const Main = styled.div`
 `;
 
 const Content = styled.div<TNavProp>`
-  background-color: ${({ colors }) => colors.light_grey};
-  height: calc(100vh - 116px);
-  width: calc(100vw - 305px);
+  background-color: ${({ colors, darkModus }) => {
+    return darkModus ? colors.very_dark_grey : colors.light_grey;
+  }};
+  height: calc(100vh - 100px);
+  width: calc(100vw - 300px);
   overflow-y: hidden;
 
   @media (max-width: 575px) {

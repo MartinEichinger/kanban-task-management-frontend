@@ -2,6 +2,7 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import pointer from './images/pointer.png';
+import { useAppSelector } from './store/hooks';
 
 interface TProps {
   colors: any;
@@ -12,6 +13,7 @@ interface TProps {
 
 const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
   const [boxChecked, setBoxChecked] = useState(checked);
+  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
 
   const toggleBoxChecked = () => {
     boxChecked ? setBoxChecked(false) : setBoxChecked(true);
@@ -21,6 +23,7 @@ const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
   return (
     <CheckboxMain
       colors={colors}
+      darkModus={darkModus}
       pointer={pointer}
       className="d-flex flex-row justify-content-start align-items-center"
       onClick={() => toggleBoxChecked()}
@@ -41,6 +44,7 @@ export default Checkbox;
 
 type TColorProp = {
   colors: any;
+  darkModus?: any;
 };
 
 type TPointerProp = {
@@ -50,7 +54,8 @@ type TPointerProp = {
 type TNavProp = TColorProp & TPointerProp;
 
 const CheckboxMain = styled.div<TNavProp>`
-  background-color: ${({ colors }) => colors.light_grey};
+  background-color: ${({ colors, darkModus }) =>
+    darkModus ? colors.very_dark_grey : colors.light_grey};
   border-radius: 4px;
   padding: 13px 16px;
 
@@ -66,15 +71,15 @@ const CheckboxMain = styled.div<TNavProp>`
     accent-color: ${({ colors }) => colors.main_purple};
   }
 
-  p {
+  p.bold {
     font-size: 12px;
     font-weight: 700;
     line-height: 15px;
-    color: ${({ colors }) => colors.black};
+    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)} !important;
     margin: 0px 0px 0px 16px;
 
     &.checked {
-      color: ${({ colors }) => colors.black50};
+      color: ${({ colors, darkModus }) => (darkModus ? colors.white50 : colors.black50)} !important;
       text-decoration: line-through;
     }
   }

@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-const debug = false;
+const debug = true;
 
 const toasty = (store) => (next) => (action) => {
   if (debug) console.log('toast: ', action);
@@ -38,6 +38,12 @@ const toasty = (store) => (next) => (action) => {
     toast.warning(`Task deleted`);
   } else if (action.type === 'taskData/boardDeleted') {
     toast.warning(`Board deleted`);
+  } else if (action.type === 'darkModus/darkModusReceived') {
+    action.payload.type === 'toast'
+      ? action.payload.modus === true
+        ? toast.success('Dark Modus enabled')
+        : toast.warning('Dark Modus disabled')
+      : console.log('Dark Modus setting: ', action.payload.modus);
   }
 
   return next(action);
