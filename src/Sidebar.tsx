@@ -143,7 +143,7 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
     cursor: url('${({ pointer }) => pointer}'), pointer;
 
     &:hover {
-      background-color: ${({ colors }) => colors.main_purple10};
+      background-color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.main_purple10)};
       color: ${({ colors }) => colors.main_purple};
 
       svg path {

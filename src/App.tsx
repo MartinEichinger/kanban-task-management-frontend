@@ -258,7 +258,12 @@ function App() {
   return (
     <div className="App" ref={winRef}>
       <div className="frame d-flex flex-column">
-        <Nav className="nav d-flex flex-row" colors={colors} pointer={pointer} darkModus={darkModus}>
+        <Nav
+          className="nav d-flex flex-row no-wrap"
+          colors={colors}
+          pointer={pointer}
+          darkModus={darkModus}
+        >
           <div className="d-none d-sm-block logo" onClick={() => ResetData('board')}>
             {!darkModus ? <LogoDark /> : <LogoLight />}
           </div>
@@ -286,7 +291,7 @@ function App() {
               </>
             )}
             <button
-              className="btn large prim"
+              className="button large prim"
               id="add-task"
               disabled={selectedBoard === -1}
               onClick={() => setNewTaskModalShow(true)}
@@ -298,6 +303,7 @@ function App() {
               className={selectedBoard > -1 ? '' : 'disabled'}
               pointer={pointer}
               colors={colors}
+              darkModus={darkModus}
               onClick={() => {
                 selectedBoard > -1 && setShowMenu(!showMenu);
               }}
@@ -305,7 +311,12 @@ function App() {
               <Ellipsis />
             </EllipsisBody>
           </div>
-          <ModalMenu colors={colors} pointer={pointer} showMenu={selectedBoard > -1 ? showMenu : false}>
+          <ModalMenu
+            colors={colors}
+            darkModus={darkModus}
+            pointer={pointer}
+            showMenu={selectedBoard > -1 ? showMenu : false}
+          >
             <p onClick={() => onClickMenu('edit')}>Edit Board</p>
             <p className="red" onClick={() => onClickMenu('delete')}>
               Delete Board
@@ -486,7 +497,8 @@ const ModalMenu = styled.div<TNavProp & TShowProp>`
   padding: 0px;
   border-radius: 8px;
   box-shadow: 0px 4px 6px 0px rgba(54, 78, 126, 0.1015);
-  background-color: white;
+  background-color: ${({ darkModus, colors }) => (darkModus ? colors.very_dark_grey : colors.white)};
+  color: ${({ darkModus, colors }) => (darkModus ? colors.medium_grey : colors.black)};
 
   p {
     padding: 8px 16px;
@@ -501,7 +513,7 @@ const ModalMenu = styled.div<TNavProp & TShowProp>`
     }
 
     &:hover {
-      background-color: ${({ colors }) => colors.light_grey};
+      background-color: ${({ darkModus, colors }) => (darkModus ? colors.dark_grey : colors.light_grey)};
       cursor: url('${({ pointer }) => pointer}'), pointer;
     }
 
@@ -517,13 +529,15 @@ const EllipsisBody = styled.div<TNavProp>`
   padding: 1px 13px 5px;
   position: relative;
   z-index: 10;
+  margin-left: 5px;
 
   &.disabled:hover {
     background-color: white;
   }
 
   &:hover {
-    background-color: ${({ colors }) => colors.lighter_grey};
+    background-color: ${({ colors, darkModus }) =>
+      darkModus ? colors.very_dark_grey : colors.lighter_grey};
   }
 `;
 const Columns = styled.div<TNavProp>`

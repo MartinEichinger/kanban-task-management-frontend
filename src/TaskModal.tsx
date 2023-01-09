@@ -93,7 +93,12 @@ const TaskModal: React.FC<TModalProp> = (props) => {
         <Modal.Title id="contained-modal-title-vcenter">
           <h2>{selectedBoard > -1 && selectedCol > -1 && selectedTask > -1 && `${task?.title}`}</h2>
         </Modal.Title>
-        <EllipsisBody pointer={pointer} colors={props.colors} onClick={() => setShowMenu(!showMenu)}>
+        <EllipsisBody
+          pointer={pointer}
+          darkModus={darkModus}
+          colors={props.colors}
+          onClick={() => setShowMenu(!showMenu)}
+        >
           <Ellipsis />
         </EllipsisBody>
       </Modal.Header>
@@ -231,7 +236,8 @@ const EllipsisBody = styled.div<TNavProp & TPointerProp>`
   z-index: 10;
 
   &:hover {
-    background-color: ${({ colors }) => colors.lighter_grey};
+    background-color: ${({ colors, darkModus }) =>
+      darkModus ? colors.very_dark_grey : colors.lighter_grey};
   }
 `;
 
