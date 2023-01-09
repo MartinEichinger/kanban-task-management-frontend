@@ -80,7 +80,6 @@ const Sidebar: React.FC<TProps> = ({
             colors={colors}
             darkModus={darkModus}
             onChange={(e: any) => {
-              console.log(e, e.target.checked);
               dispatch(setDarkModus({ modus: e.target.checked }));
             }}
           />

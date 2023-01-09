@@ -30,7 +30,6 @@ export const slice = createSlice({
     },
 
     darkModusReceived: (state, action: PayloadAction<IPayloadReceive>) => {
-      console.log(action.payload);
       state.darkModus = action.payload.modus;
       state.loading = false;
     },
@@ -54,7 +53,6 @@ interface ISetDarkModus {
 export const setDarkModus =
   ({ modus }: ISetDarkModus): AppThunk =>
   async (dispatch) => {
-    console.log(modus);
     dispatch(darkModusRequested());
     var type = 'toast';
     dispatch(darkModusReceived({ type, modus }));

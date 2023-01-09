@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 
-const debug = true;
+const debug = false;
 
 const toasty = (store) => (next) => (action) => {
   if (debug) console.log('toast: ', action);
