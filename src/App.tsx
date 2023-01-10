@@ -532,7 +532,7 @@ const EllipsisBody = styled.div<TNavProp>`
   margin-left: 5px;
 
   &.disabled:hover {
-    background-color: white;
+    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
   }
 
   &:hover {
