@@ -1,0 +1,33 @@
+.light .themeBgDark {
+  background: "rgba(255,255,255,1)";
+  color: "rgba(0,1,18,1)";
+}
+.light .themeBg {
+  background: "rgba(255,255,255,1)";
+}
+.light .themeBg2 {
+  background: "rgba(233, 239, 250, 1)";
+}
+.light .themeHg {
+  color: "rgba(0,1,18,1)";
+}
+.light .themeP:hover {
+  background: "rgba(244,247,253,1)";
+}
+
+.dark .themeBgDark {
+  background: "rgba(32,33,44,1)";
+  color: "rgba(130,143,163,1)";
+}
+.dark .themeBg {
+  background: "rgba(43,44,55,1)";
+}
+.dark .themeBg2 {
+  background: "rgba(43,44,55,1)";
+}
+.dark .themeHg {
+  color: "rgba(255,255,255,1)";
+}
+.dark .themeP:hover {
+  background: "rgba(244,247,253,1)";
+}/*# sourceMappingURL=theme.module.css.map */

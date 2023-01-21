@@ -1,0 +1,88 @@
+$main_purple: rgba(99, 95, 199, 1);
+$main_purple25: rgba(99, 95, 199, 0.25);
+$main_purple10: rgba(99, 95, 199, 0.1);
+$main_purple_hover: rgba(168, 164, 255, 1);
+$main_purple_light: rgba(99, 95, 199, 0.1);
+$main_purple_light_hover: rgba(99, 95, 199, 0.25);
+$medium_grey: rgba(130, 143, 163, 1);
+$medium_grey25: rgba(130, 143, 163, 0.25);
+$light_grey: rgba(244, 247, 253, 1);
+$lighter_grey: rgba(233, 239, 250, 1);
+$dark_grey: rgba(43, 44, 55, 1);
+$very_dark_grey: rgba(32, 33, 44, 1);
+$white: rgba(255, 255, 255, 1);
+$white50: rgba(255, 255, 255, 0.5);
+$white25: rgba(255, 255, 255, 0.25);
+$red: rgba(234, 85, 85, 1);
+$black: rgba(0, 1, 18, 1);
+$black50: rgba(0, 1, 18, 0.5);
+$lines_light: rgba(228, 235, 250, 1);
+$lines_dark: rgba(62, 63, 78, 1);
+
+.themeBgDark {
+  background: $very_dark_grey;
+  color: $medium_grey;
+}
+
+.themeBgDark2 {
+  background: $very_dark_grey !important;
+}
+
+.themeBg {
+  background: $dark_grey;
+}
+
+.themeBg2 {
+  background: $dark_grey !important;
+}
+
+.themeBorder {
+  border-color: $lines_dark !important;
+}
+
+.themeHg {
+  color: $white;
+}
+
+.themeHover {
+  &:hover {
+    background: $dark_grey !important;
+  }
+}
+
+.themeHoverDark {
+  &:hover {
+    background: $very_dark_grey;
+  }
+}
+
+.themeHoverLight {
+  &:hover {
+    background: $white !important;
+  }
+}
+
+.themePHoverDark {
+  p:hover {
+    background: $dark_grey;
+  }
+}
+
+.themeTypoDark {
+  color: $white !important;
+}
+
+.themeTypoDark50 {
+  color: $white50 !important;
+}
+
+.themeTypoGrey {
+  color: $white;
+}
+
+.themeTypoDarkHover {
+  color: $white !important;
+  &:hover {
+    color: $main_purple !important;
+  }
+}

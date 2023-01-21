@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
 import Sidebar from './Sidebar';
 import pointer from './images/pointer.png';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TModalProp {
   show: any;
@@ -32,6 +33,7 @@ const SidebarMenuModal: React.FC<TModalProp> = ({
   ToggleSidebarCollapse,
 }) => {
   const debug = 0;
+  const theme = useThemeContext();
 
   return (
     <SidebarMenuModalMain
@@ -63,6 +65,7 @@ export default SidebarMenuModal;
 
 type TNavProp = {
   colors: any;
+  darkModus?: any;
 };
 
 type TPointerProp = {
@@ -75,6 +78,7 @@ const SidebarMenuModalMain = styled(Modal)<TNavProp & TPointerProp>`
   .modal-content {
     position: absolute;
     top: 100px;
+    //background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
   }
 
   .modal-body {
@@ -84,6 +88,7 @@ const SidebarMenuModalMain = styled(Modal)<TNavProp & TPointerProp>`
 
 const SidebarSMM = styled(Sidebar)<TNavProp>`
   &.collapsed {
-    width: 300px;
+    width: 282px;
+    padding-bottom: 0px;
   }
 `;

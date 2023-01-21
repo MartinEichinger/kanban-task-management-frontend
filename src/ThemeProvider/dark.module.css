@@ -1,0 +1,59 @@
+.themeBgDark {
+  background: rgb(32, 33, 44);
+  color: rgb(130, 143, 163);
+}
+
+.themeBgDark2 {
+  background: rgb(32, 33, 44) !important;
+}
+
+.themeBg {
+  background: rgb(43, 44, 55);
+}
+
+.themeBg2 {
+  background: rgb(43, 44, 55) !important;
+}
+
+.themeBorder {
+  border-color: rgb(62, 63, 78) !important;
+}
+
+.themeHg {
+  color: rgb(255, 255, 255);
+}
+
+.themeHover:hover {
+  background: rgb(43, 44, 55) !important;
+}
+
+.themeHoverDark:hover {
+  background: rgb(32, 33, 44);
+}
+
+.themeHoverLight:hover {
+  background: rgb(255, 255, 255) !important;
+}
+
+.themePHoverDark p:hover {
+  background: rgb(43, 44, 55);
+}
+
+.themeTypoDark {
+  color: rgb(255, 255, 255) !important;
+}
+
+.themeTypoDark50 {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.themeTypoGrey {
+  color: rgb(255, 255, 255);
+}
+
+.themeTypoDarkHover {
+  color: rgb(255, 255, 255) !important;
+}
+.themeTypoDarkHover:hover {
+  color: rgb(99, 95, 199) !important;
+}/*# sourceMappingURL=dark.module.css.map */

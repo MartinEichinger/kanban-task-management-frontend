@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import styled from '@emotion/styled';
+import { ThemeProvider, useThemeContext } from './ThemeProvider/ThemeProvider';
 
 import { ReactComponent as LogoDark } from './images/logo-dark.svg';
 import { ReactComponent as LogoLight } from './images/logo-light.svg';
@@ -84,9 +85,11 @@ function App() {
 
   const dispatch = useAppDispatch();
   data.boards = useAppSelector((state) => state.taskData.boards);
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  //const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
+  const themeLight = theme.status == 'light';
 
-  const debug = 0;
+  const debug = 2;
 
   useEffect(() => {
     // get directus data
@@ -206,7 +209,6 @@ function App() {
         className="d-flex flex-row justify-content-start align-items-start"
         colors={colors}
         pointer={pointer}
-        darkModus={darkModus}
       >
         {obj.columns?.map((item: any, i: any) => {
           return (
@@ -223,12 +225,18 @@ function App() {
                   return (
                     <Task
                       type="button"
-                      className="task"
+                      className={
+                        'task ' +
+                        theme.theme.themeBg +
+                        ' ' +
+                        theme.theme.themeHover +
+                        ' ' +
+                        theme.theme.themeTypoDark
+                      }
                       onClick={() => selectTask(i, j)}
                       key={j}
                       pointer={pointer}
                       colors={colors}
-                      darkModus={darkModus}
                     >
                       <h3>{task.title}</h3>
                       <p className="bold">
@@ -242,7 +250,10 @@ function App() {
           );
         })}
         <div
-          className="column add-col d-flex flex-column justify-content-center align-items-center"
+          className={
+            'column add-col d-flex flex-column justify-content-center align-items-center ' +
+            theme.theme.themeBg2
+          }
           onClick={() => {
             setEditedBoard(selectedBoard);
             setNewBoardModalShow(true);
@@ -254,22 +265,27 @@ function App() {
     );
   };
 
-  if (debug > 0) console.log('App/beforeRender: ', data);
+  if (debug > 0) console.log('App/beforeRender: ', data, theme, themeLight);
   return (
     <div className="App" ref={winRef}>
       <div className="frame d-flex flex-column">
-        <Nav
-          className="nav d-flex flex-row no-wrap"
-          colors={colors}
-          pointer={pointer}
-          darkModus={darkModus}
-        >
-          <div className="d-none d-sm-block logo" onClick={() => ResetData('board')}>
-            {!darkModus ? <LogoDark /> : <LogoLight />}
+        <Nav className="nav d-flex flex-row no-wrap" colors={colors} pointer={pointer}>
+          <div
+            className={'d-none d-sm-block logo ' + theme.theme.themeBg + ' ' + theme.theme.themeBorder}
+            onClick={() => ResetData('board')}
+          >
+            {themeLight ? <LogoDark /> : <LogoLight />}
           </div>
-          <div className="navbar d-flex flex-row justify-content-around">
+          <div
+            className={
+              'navbar d-flex flex-row justify-content-around ' +
+              theme.theme.themeBg +
+              ' ' +
+              theme.theme.themeBorder
+            }
+          >
             <LogoMobile className="d-flex d-sm-none mr-3 pointer" onClick={() => ResetData('board')} />
-            <h1 className="mr-sm-auto mr-2">
+            <h1 className={'mr-sm-auto mr-2 ' + theme.theme.themeHg}>
               {selectedBoard > -1 ? (data as any).boards?.[selectedBoard]?.name : '...board'}
             </h1>
             {width !== undefined && width < 576 && (
@@ -303,7 +319,6 @@ function App() {
               className={selectedBoard > -1 ? '' : 'disabled'}
               pointer={pointer}
               colors={colors}
-              darkModus={darkModus}
               onClick={() => {
                 selectedBoard > -1 && setShowMenu(!showMenu);
               }}
@@ -312,13 +327,15 @@ function App() {
             </EllipsisBody>
           </div>
           <ModalMenu
+            className={theme.theme.themeBgDark}
             colors={colors}
-            darkModus={darkModus}
             pointer={pointer}
             showMenu={selectedBoard > -1 ? showMenu : false}
           >
-            <p onClick={() => onClickMenu('edit')}>Edit Board</p>
-            <p className="red" onClick={() => onClickMenu('delete')}>
+            <p className={theme.theme.themeP} onClick={() => onClickMenu('edit')}>
+              Edit Board
+            </p>
+            <p className={'red ' + theme.theme.themeP} onClick={() => onClickMenu('delete')}>
               Delete Board
             </p>
           </ModalMenu>
@@ -335,18 +352,23 @@ function App() {
             ToggleSidebarCollapse={ToggleSidebarCollapse}
           />
 
-          <Content
-            colors={colors}
-            darkModus={darkModus}
-            pointer={pointer}
-            className={sidebarCollapse ? 'collapsed' : ''}
-          >
+          <Content colors={colors} pointer={pointer} className={sidebarCollapse ? 'collapsed' : ''}>
             {selectedBoard > -1 ? (
-              <div className="content d-flex flex-column justify-content-start align-items-start">
+              <div
+                className={
+                  'content d-flex flex-column justify-content-start align-items-start ' +
+                  theme.theme.themeBgDark2
+                }
+              >
                 <RenderContent />
               </div>
             ) : (
-              <div className="content d-flex flex-column justify-content-center align-items-center">
+              <div
+                className={
+                  'content d-flex flex-column justify-content-center align-items-center ' +
+                  theme.theme.themeBgDark2
+                }
+              >
                 <h2>
                   This board is empty. Create a new column to get started. {width} / {height}
                 </h2>
@@ -497,8 +519,9 @@ const ModalMenu = styled.div<TNavProp & TShowProp>`
   padding: 0px;
   border-radius: 8px;
   box-shadow: 0px 4px 6px 0px rgba(54, 78, 126, 0.1015);
-  background-color: ${({ darkModus, colors }) => (darkModus ? colors.very_dark_grey : colors.white)};
-  color: ${({ darkModus, colors }) => (darkModus ? colors.medium_grey : colors.black)};
+  /* background-color: ${({ darkModus, colors }) =>
+    darkModus ? colors.very_dark_grey : colors.white}; */
+  /* color: ${({ darkModus, colors }) => (darkModus ? colors.medium_grey : colors.black)}; */
 
   p {
     padding: 8px 16px;
@@ -513,7 +536,8 @@ const ModalMenu = styled.div<TNavProp & TShowProp>`
     }
 
     &:hover {
-      background-color: ${({ darkModus, colors }) => (darkModus ? colors.dark_grey : colors.light_grey)};
+      /* background-color: ${({ darkModus, colors }) =>
+        darkModus ? colors.dark_grey : colors.light_grey}; */
       cursor: url('${({ pointer }) => pointer}'), pointer;
     }
 
@@ -555,9 +579,9 @@ const Columns = styled.div<TNavProp>`
 
     &.add-col {
       border-radius: 6px;
-      background-color: ${({ colors, darkModus }) => {
+      /* background-color: ${({ colors, darkModus }) => {
         return darkModus ? colors.dark_grey : colors.lighter_grey;
-      }};
+      }}; */
       height: calc(100% - 62px);
       margin-top: 50px;
 
@@ -614,10 +638,6 @@ const Columns = styled.div<TNavProp>`
 `;
 
 const Task = styled.button<TColorProp & TNavProp>`
-  background-color: ${({ colors, darkModus }) => {
-    return darkModus ? colors.dark_grey : colors.white;
-  }};
-
   border-radius: 8px;
   padding: 23px 16px;
   margin-bottom: 20px;
@@ -628,9 +648,6 @@ const Task = styled.button<TColorProp & TNavProp>`
   &:focus-visible,
   &:active,
   &:focus {
-    background-color: ${({ colors, darkModus }) => {
-      return darkModus ? colors.dark_grey : colors.white;
-    }};
     cursor: url('${({ pointer }) => pointer}'), pointer;
     border: none;
     outline: none;
@@ -643,9 +660,7 @@ const Task = styled.button<TColorProp & TNavProp>`
 
   h3 {
     text-align: left;
-    color: ${({ colors, darkModus }) => {
-      return darkModus ? colors.white : colors.black;
-    }};
+    color: inherit;
   }
 
   p {
@@ -658,36 +673,18 @@ const Task = styled.button<TColorProp & TNavProp>`
 const Nav = styled.div<TColorProp & TPointerProp>`
   .logo {
     padding: 35px 24px;
-    border: 1px solid
-      ${({ colors, darkModus }) => {
-        return darkModus ? colors.lines_dark : colors.lines_light;
-      }};
+    border: 1px solid white;
     border-top: 0px;
     border-left: 0px;
     width: 300px;
     cursor: url('${({ pointer }) => pointer}'), pointer;
-    background-color: ${({ colors, darkModus }) => {
-      return darkModus ? colors.dark_grey : colors.white;
-    }};
   }
 
   .navbar {
     padding: 29px 32px 37px;
-    border-bottom: 1px solid
-      ${({ colors, darkModus }) => {
-        return darkModus ? colors.lines_dark : colors.lines_light;
-      }};
+    border-bottom: 1px solid white;
     border-top: 0px;
     width: calc(100vw - 300px);
-    background-color: ${({ colors, darkModus }) => {
-      return darkModus ? colors.dark_grey : colors.white;
-    }};
-
-    h1 {
-      color: ${({ colors, darkModus }) => {
-        return darkModus ? colors.white : colors.black;
-      }};
-    }
 
     @media (max-width: 575px) {
       width: 100vw;
@@ -714,9 +711,6 @@ const Main = styled.div`
 `;
 
 const Content = styled.div<TNavProp>`
-  background-color: ${({ colors, darkModus }) => {
-    return darkModus ? colors.very_dark_grey : colors.light_grey;
-  }};
   height: calc(100vh - 100px);
   width: calc(100vw - 300px);
   overflow-y: hidden;

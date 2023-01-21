@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
+import { ThemeProvider } from './ThemeProvider/ThemeProvider';
 import { store } from './store/store';
 import { ToastContainer } from 'react-toastify';
 import reportWebVitals from './reportWebVitals';
@@ -12,8 +13,10 @@ import 'react-toastify/dist/ReactToastify.css';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <Provider store={store}>
-    <ToastContainer />
-    <App />
+    <ThemeProvider>
+      <ToastContainer />
+      <App />
+    </ThemeProvider>
   </Provider>
 );
 

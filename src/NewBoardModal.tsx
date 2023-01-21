@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { useAppSelector } from './store/hooks';
 import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
 import Textfield from './Textfield';
 import Textarea from './Textarea';
 import Multitaskfield from './Multitaskfield';
 import Dropdown from './Dropdown';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TModalProp {
   colors: any;
@@ -20,7 +20,7 @@ interface TModalProp {
 const NewBoardModal: React.FC<TModalProp> = (props) => {
   const [title, setTitle] = useState('');
   const [columns, setColumns] = useState([{ id: '', name: '' }]);
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
 
   const debug = 0;
 
@@ -58,19 +58,18 @@ const NewBoardModal: React.FC<TModalProp> = (props) => {
   return (
     <BoardModalMain
       colors={props.colors}
-      darkModus={darkModus}
       show={props.show}
       onHide={props.onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header>
-        <Modal.Title id="contained-modal-title-vcenter">
+      <Modal.Header className={theme.theme.themeBg}>
+        <Modal.Title id="contained-modal-title-vcenter" className={theme.theme.themeTypoDark}>
           <h2>{props.edit > -1 ? 'Edit Board' : 'Add New Board'}</h2>
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={theme.theme.themeBg}>
         <>
           <TextfieldNTM
             colors={props.colors}
@@ -135,13 +134,7 @@ const BoardModalMain = styled(Modal)<TNavProp>`
     border: 0px;
   }
 
-  .modal-header {
-    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
-    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)};
-  }
-
   .modal-body {
-    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
     border-bottom-left-radius: var(--bs-modal-inner-border-radius);
     border-bottom-right-radius: var(--bs-modal-inner-border-radius);
   }

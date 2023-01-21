@@ -1,9 +1,9 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 import { useState, useEffect } from 'react';
-import { useAppSelector } from './store/hooks';
 import Textfield from './Textfield';
 import { ReactComponent as Cross } from './icon-cross.svg';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface IMultitaskfield {
   className?: string;
@@ -30,7 +30,7 @@ const Multitaskfield: React.FC<IMultitaskfield> = ({
   if (debug >= 1) console.log('Multitaskfield: ', title, placeholder, values);
   const placeholderList = placeholder;
   const [taskList, setTaskList] = useState(values);
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
 
   useEffect(() => {
     if (debug >= 2) console.log('Multitaskfield/useEffect: ', values);
@@ -69,8 +69,10 @@ const Multitaskfield: React.FC<IMultitaskfield> = ({
 
   if (debug >= 1) console.log('Multitaskfield/beforeRender: ', taskList);
   return (
-    <MultitaskfieldMain colors={colors} darkModus={darkModus} className={className}>
-      <label htmlFor="Textarea">{title}</label>
+    <MultitaskfieldMain colors={colors} className={className}>
+      <label className={theme.theme.themeTypoGrey} htmlFor="Textarea">
+        {title}
+      </label>
 
       {taskList.map((item, i) => {
         return (
@@ -86,7 +88,7 @@ const Multitaskfield: React.FC<IMultitaskfield> = ({
         );
       })}
       <button
-        className={darkModus ? 'small second dark-modus w-100' : 'small second w-100'}
+        className={1 ? 'small second dark-modus w-100' : 'small second w-100'}
         onClick={() => AddRemoveSubTask(-1)}
       >
         + Add New {title.slice(0, -1)}
@@ -112,7 +114,6 @@ const MultitaskfieldMain = styled.div<TNavProp>`
     font-size: 12px;
     font-weight: 700;
     line-height: 15px;
-    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.medium_grey)};
     margin-bottom: 8px;
   }
 

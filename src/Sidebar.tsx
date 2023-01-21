@@ -4,8 +4,7 @@ import pointer from './images/pointer.png';
 import ToggleDarkModus from './ToggleDarkModus';
 import { ReactComponent as SidebarIcon } from './images/icon-board.svg';
 import { ReactComponent as HideIcon } from './images/icon-hide-sidebar.svg';
-import { useAppSelector, useAppDispatch } from './store/hooks';
-import { setDarkModus } from './store/darkModusSlices';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TProps {
   className?: string;
@@ -30,29 +29,33 @@ const Sidebar: React.FC<TProps> = ({
   setNewBoardModalShow,
   ToggleSidebarCollapse,
 }) => {
-  const dispatch = useAppDispatch();
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
 
   return (
     <SidebarMain
       className={
         sidebarCollapse
-          ? `${className} sidebar collapsed d-flex flex-column justify-content-between`
-          : `${className} sidebar d-flex flex-column justify-content-between`
+          ? `${className} sidebar collapsed d-flex flex-column justify-content-between ` +
+            theme.theme.themeBg +
+            ' ' +
+            theme.theme.themeBorder
+          : `${className} sidebar d-flex flex-column justify-content-between ` +
+            theme.theme.themeBg +
+            ' ' +
+            theme.theme.themeBorder
       }
       colors={colors}
       pointer={pointer}
-      darkModus={darkModus}
     >
-      <div className="upper d-flex flex-column">
-        <h3 className="sidebar-heading">ALL BOARDS ({data.boards?.length})</h3>
+      <div className="upper d-flex flex-column h-100">
+        <h3 className={'sidebar-heading '}>ALL BOARDS ({data.boards?.length})</h3>
         {data.boards?.map((item: any, i: any) => {
           return (
             <div
               className={
                 selectedBoard === i
-                  ? 'nav-item d-flex flex-row align-items-center active'
-                  : 'nav-item d-flex flex-row align-items-center'
+                  ? 'nav-item d-flex flex-row align-items-center active '
+                  : 'nav-item d-flex flex-row align-items-center ' + theme.theme.themeHoverLight
               }
               onClick={() => selectBoard(i)}
               key={i}
@@ -63,7 +66,7 @@ const Sidebar: React.FC<TProps> = ({
           );
         })}
         <div
-          className="nav-item-plus d-flex flex-row align-items-center"
+          className="nav-item-plus d-flex flex-row align-items-center mb-auto"
           onClick={() => {
             setEditedBoard(-1);
             setNewBoardModalShow(true);
@@ -72,18 +75,17 @@ const Sidebar: React.FC<TProps> = ({
           <SidebarIcon />
           <h3>+ Create New Board</h3>
         </div>
-      </div>
-      <div className="lower d-none d-sm-flex flex-column">
-        {!sidebarCollapse && (
-          <ToggleDarkModusSB
-            className="toggle-dark-modus"
+        {1 && (
+          <ToggleDarkModus
+            className={'toggle-dark-modus ' + theme.theme.themeBgDark2}
             colors={colors}
-            darkModus={darkModus}
             onChange={(e: any) => {
-              dispatch(setDarkModus({ modus: e.target.checked }));
+              theme.toggleTheme();
             }}
           />
         )}
+      </div>
+      <div className="lower d-none d-sm-flex flex-column">
         <div
           className={
             sidebarCollapse
@@ -114,13 +116,7 @@ type TPointerProp = {
 const SidebarMain = styled.div<TColorProp & TPointerProp>`
   width: 300px;
   padding-bottom: 80px;
-  border-right: 1px solid
-    ${({ colors, darkModus }) => {
-      return darkModus ? colors.lines_dark : colors.lines_light;
-    }};
-  background-color: ${({ colors, darkModus }) => {
-    return darkModus ? colors.dark_grey : colors.white;
-  }};
+  border-right: 1px solid white;
 
   &.collapsed {
     width: 0px;
@@ -128,9 +124,7 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
 
   .sidebar-heading {
     padding: 14px 93px 15px 32px;
-    color: ${({ colors, darkModus }) => {
-      return darkModus ? colors.medium_grey : colors.black;
-    }};
+    color: ${({ colors }) => colors.medium_grey}};
   }
 
   .nav-item {
@@ -142,7 +136,8 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
     cursor: url('${({ pointer }) => pointer}'), pointer;
 
     &:hover {
-      background-color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.main_purple10)};
+      //background-color: ${({ colors, darkModus }) =>
+        darkModus ? colors.white : colors.main_purple10};
       color: ${({ colors }) => colors.main_purple};
 
       svg path {
@@ -211,10 +206,4 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
       }
     }
   }
-`;
-
-const ToggleDarkModusSB = styled(ToggleDarkModus)<TColorProp>`
-  background-color: ${({ colors, darkModus }) => {
-    return darkModus ? colors.very_dark_grey : colors.light_grey;
-  }};
 `;

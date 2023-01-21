@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { useAppSelector } from './store/hooks';
 import Modal from 'react-bootstrap/Modal';
 import pointer from './images/pointer.png';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TSelectionProp {
   selectedBoard: number;
@@ -24,12 +25,11 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
   const debug = 0;
 
   var { selectedBoard, selectedCol, selectedTask } = props.selection;
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
 
   return (
     <DeleteModalMain
       colors={props.colors}
-      darkModus={darkModus}
       pointer={pointer}
       show={props.show}
       onHide={props.onHide}
@@ -37,12 +37,12 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header>
+      <Modal.Header className={theme.theme.themeBg}>
         <Modal.Title id="contained-modal-title-vcenter">
           <h2 className="red">Delete this task?</h2>
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={theme.theme.themeBg}>
         <p>
           Are you sure you want to delete the ‘{props.title}’ {props.target} and its{' '}
           {props.target === 'task' ? 'sub' : ''}tasks? This action cannot be reversed.
@@ -66,7 +66,7 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
             Delete
           </button>
           <button
-            className={darkModus ? 'btn small second dark-modus w-100' : 'btn small second w-100'}
+            className={1 ? 'btn small second dark-modus w-100' : 'btn small second w-100'}
             onClick={props.onHide}
           >
             Cancel
@@ -93,12 +93,7 @@ const DeleteModalMain = styled(Modal)<TNavProp & TPointerProp>`
     border: 0px;
   }
 
-  .modal-header {
-    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
-  }
-
   .modal-body {
-    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
     border-bottom-left-radius: var(--bs-modal-inner-border-radius);
     border-bottom-right-radius: var(--bs-modal-inner-border-radius);
   }

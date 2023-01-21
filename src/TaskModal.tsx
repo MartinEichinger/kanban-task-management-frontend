@@ -12,6 +12,7 @@ import pointer from './images/pointer.png';
 
 import { updateTask } from './store/taskSlices';
 import { useAppSelector, useAppDispatch } from './store/hooks';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TDataProp {
   boards: {
@@ -60,7 +61,7 @@ const TaskModal: React.FC<TModalProp> = (props) => {
   const dispatch = useAppDispatch();
 
   const [showMenu, setShowMenu] = useState(false);
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
 
   if (debug >= 1) console.log('CustomModal ', props, selectedBoard, selectedCol, selectedTask);
   if (debug >= 2 && selectedBoard > -1 && selectedCol > -1 && selectedTask > -1) {
@@ -82,33 +83,37 @@ const TaskModal: React.FC<TModalProp> = (props) => {
   return (
     <TaskModalMain
       colors={props.colors}
-      darkModus={darkModus}
       show={props.show}
       onHide={props.onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header>
-        <Modal.Title id="contained-modal-title-vcenter">
+      <Modal.Header className={theme.theme.themeBg}>
+        <Modal.Title id="contained-modal-title-vcenter" className={theme.theme.themeTypoDark}>
           <h2>{selectedBoard > -1 && selectedCol > -1 && selectedTask > -1 && `${task?.title}`}</h2>
         </Modal.Title>
         <EllipsisBody
+          className={theme.theme.themeHoverDark}
           pointer={pointer}
-          darkModus={darkModus}
           colors={props.colors}
           onClick={() => setShowMenu(!showMenu)}
         >
           <Ellipsis />
         </EllipsisBody>
       </Modal.Header>
-      <ModalMenu colors={props.colors} pointer={pointer} showMenu={showMenu}>
+      <ModalMenu
+        className={theme.theme.themeBgDark + ' ' + theme.theme.themePHoverDark}
+        colors={props.colors}
+        pointer={pointer}
+        showMenu={showMenu}
+      >
         <p onClick={() => onClickMenu('edit')}>Edit Task</p>
         <p className="red" onClick={() => onClickMenu('delete')}>
           Delete Task
         </p>
       </ModalMenu>
-      <Modal.Body>
+      <Modal.Body className={theme.theme.themeBg}>
         <>
           <p>{task?.description}</p>
           <p className="bold">Subtasks({task?.subtasks.length})</p>
@@ -203,7 +208,7 @@ const ModalMenu = styled.div<TCombiProp>`
   padding: 0px;
   border-radius: 8px;
   box-shadow: 0px 4px 6px 0px rgba(54, 78, 126, 0.1015);
-  background-color: white;
+  //background-color: white;
 
   p {
     padding: 8px 16px;
@@ -218,7 +223,7 @@ const ModalMenu = styled.div<TCombiProp>`
     }
 
     &:hover {
-      background-color: ${({ colors }) => colors.light_grey};
+      //background-color: ${({ colors }) => colors.light_grey};
       cursor: url('${({ pointer }) => pointer}'), pointer;
     }
 
@@ -234,11 +239,6 @@ const EllipsisBody = styled.div<TNavProp & TPointerProp>`
   padding: 1px 13px 5px;
   position: relative;
   z-index: 10;
-
-  &:hover {
-    background-color: ${({ colors, darkModus }) =>
-      darkModus ? colors.very_dark_grey : colors.lighter_grey};
-  }
 `;
 
 const TaskModalMain = styled(Modal)<TNavProp>`
@@ -246,21 +246,12 @@ const TaskModalMain = styled(Modal)<TNavProp>`
     border: 0px;
   }
 
-  .modal-header {
-    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
-
-    .modal-title {
-      color: ${({ colors, darkModus }) => (!darkModus ? colors.black : colors.white)};
-    }
-  }
-
   .modal-body {
-    background-color: ${({ colors, darkModus }) => (darkModus ? colors.dark_grey : colors.white)};
     border-bottom-left-radius: var(--bs-modal-inner-border-radius);
     border-bottom-right-radius: var(--bs-modal-inner-border-radius);
 
     .bold {
-      color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.medium_grey)};
+      //color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.medium_grey)};
     }
   }
 

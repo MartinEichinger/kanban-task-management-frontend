@@ -2,7 +2,7 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import pointer from './images/pointer.png';
-import { useAppSelector } from './store/hooks';
+import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TProps {
   colors: any;
@@ -13,7 +13,7 @@ interface TProps {
 
 const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
   const [boxChecked, setBoxChecked] = useState(checked);
-  const darkModus = useAppSelector((state) => state.darkModus.darkModus);
+  const theme = useThemeContext();
 
   const toggleBoxChecked = () => {
     boxChecked ? setBoxChecked(false) : setBoxChecked(true);
@@ -23,9 +23,8 @@ const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
   return (
     <CheckboxMain
       colors={colors}
-      darkModus={darkModus}
       pointer={pointer}
-      className="d-flex flex-row justify-content-start align-items-center"
+      className={'d-flex flex-row justify-content-start align-items-center ' + theme.theme.themeBgDark2}
       onClick={() => toggleBoxChecked()}
     >
       <input
@@ -35,7 +34,15 @@ const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
         aria-label="Checkbox for following text"
         onChange={() => toggleBoxChecked()}
       />
-      <p className={boxChecked ? 'bold checked' : 'bold'}>{text}</p>
+      <p
+        className={
+          boxChecked
+            ? theme.theme.themeTypoDark50 + ' bold checked'
+            : theme.theme.themeTypoDark + ' bold'
+        }
+      >
+        {text}
+      </p>
     </CheckboxMain>
   );
 };
@@ -54,8 +61,6 @@ type TPointerProp = {
 type TNavProp = TColorProp & TPointerProp;
 
 const CheckboxMain = styled.div<TNavProp>`
-  background-color: ${({ colors, darkModus }) =>
-    darkModus ? colors.very_dark_grey : colors.light_grey};
   border-radius: 4px;
   padding: 13px 16px;
 
@@ -75,11 +80,11 @@ const CheckboxMain = styled.div<TNavProp>`
     font-size: 12px;
     font-weight: 700;
     line-height: 15px;
-    color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)} !important;
+    //color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)} !important;
     margin: 0px 0px 0px 16px;
 
     &.checked {
-      color: ${({ colors, darkModus }) => (darkModus ? colors.white50 : colors.black50)} !important;
+      //color: ${({ colors, darkModus }) => (darkModus ? colors.white50 : colors.black50)} !important;
       text-decoration: line-through;
     }
   }
