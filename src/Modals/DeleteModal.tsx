@@ -1,9 +1,10 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
-import { useAppSelector } from './store/hooks';
+import { useAppSelector } from '../store/hooks';
 import Modal from 'react-bootstrap/Modal';
-import pointer from './images/pointer.png';
-import { useThemeContext } from './ThemeProvider/ThemeProvider';
+import pointer from '../images/pointer.png';
+import { useThemeContext } from '../ThemeProvider/ThemeProvider';
+import { useSelectStatus } from '../SelectStatusProvider/SelectStatusProvider';
 
 interface TSelectionProp {
   selectedBoard: number;
@@ -12,24 +13,22 @@ interface TSelectionProp {
 }
 
 interface TModalProp {
-  colors: any;
   show: any;
   onHide: any;
-  selection: TSelectionProp;
   title: string;
   onDelete: any;
   target: string;
 }
 
 const DeleteModal: React.FC<TModalProp> = (props) => {
+  // RETRIEVE DATA / THEME / SELECT STATUS / INTERNAL STATE
+  const { colors, theme } = useThemeContext();
+  const { selectedBoard, selectedCol, selectedTask } = useSelectStatus();
   const debug = 0;
-
-  var { selectedBoard, selectedCol, selectedTask } = props.selection;
-  const theme = useThemeContext();
 
   return (
     <DeleteModalMain
-      colors={props.colors}
+      colors={colors}
       pointer={pointer}
       show={props.show}
       onHide={props.onHide}
@@ -37,12 +36,12 @@ const DeleteModal: React.FC<TModalProp> = (props) => {
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header className={theme.theme.themeBg}>
+      <Modal.Header className={theme.themeBg}>
         <Modal.Title id="contained-modal-title-vcenter">
           <h2 className="red">Delete this task?</h2>
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className={theme.theme.themeBg}>
+      <Modal.Body className={theme.themeBg}>
         <p>
           Are you sure you want to delete the ‘{props.title}’ {props.target} and its{' '}
           {props.target === 'task' ? 'sub' : ''}tasks? This action cannot be reversed.
@@ -81,7 +80,6 @@ export default DeleteModal;
 
 type TNavProp = {
   colors: any;
-  darkModus?: any;
 };
 
 type TPointerProp = {

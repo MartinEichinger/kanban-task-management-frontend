@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.1.1",
     "@craco/craco": "^7.0.0",
     "@directus/sdk": "^10.3.0",
     "@emotion/react": "^11.9.3",
@@ -16,6 +17,7 @@
     "@types/react": "^18.0.14",
     "@types/react-bootstrap": "^0.32.30",
     "@types/react-dom": "^18.0.5",
+    "aws-amplify": "^6.0.12",
     "bootstrap": "^5.2.0",
     "css-loader": "^6.7.3",
     "immer": "^9.0.16",

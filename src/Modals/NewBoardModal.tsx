@@ -2,49 +2,49 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
-import Textfield from './Textfield';
-import Textarea from './Textarea';
-import Multitaskfield from './Multitaskfield';
-import Dropdown from './Dropdown';
-import { useThemeContext } from './ThemeProvider/ThemeProvider';
+import Textfield from '../Textfield';
+import Textarea from '../Textarea';
+import Multitaskfield from '../Multitaskfield';
+import Dropdown from '../Dropdown';
+import { useThemeContext } from '../ThemeProvider/ThemeProvider';
+import { useSelectStatus } from '../SelectStatusProvider/SelectStatusProvider';
+import { IDatabaseBoard } from '../store/taskSlices';
 
 interface TModalProp {
-  colors: any;
   show: any;
   onHide: any;
   changeData: any;
-  edit: number;
-  data: any;
+  boards: IDatabaseBoard[];
 }
 
 const NewBoardModal: React.FC<TModalProp> = (props) => {
+  // RETRIEVE DATA / THEME / SELECT STATUS / INTERNAL STATE
+  const { colors, theme } = useThemeContext();
+  const { editedBoard } = useSelectStatus();
+  const boardEdited = editedBoard > -1;
   const [title, setTitle] = useState('');
   const [columns, setColumns] = useState([{ id: '', name: '' }]);
-  const theme = useThemeContext();
 
   const debug = 0;
 
-  var cols = props.data.boards?.[props.edit]?.columns.map((col: any) => {
+  var cols = props.boards?.[editedBoard]?.columns.map((col: any) => {
     return { id: col.id, name: col.name };
   });
-  if (debug >= 2) console.log('NewBoardModal: ', cols);
-  if (debug >= 2) console.log('NewBoardModal: ', props.edit, props.data.boards?.[props.edit]?.name);
 
   useEffect(() => {
-    if (debug >= 2) console.log('NewBoardModal/useEffect: ', props.edit);
-    if (props.edit > -1) {
-      setTitle(props.data.boards[props.edit].name);
+    if (boardEdited) {
+      setTitle(props.boards[editedBoard].name);
       setColumns(cols);
     } else {
       setTitle('');
     }
-  }, [props.edit]);
+  }, [editedBoard]);
 
   const AddNewBoard = () => {
     //Validation
 
     // Return value
-    props.changeData({ title, columns, edit: props.edit });
+    props.changeData({ title, columns, edit: editedBoard });
     ResetData();
   };
 
@@ -57,31 +57,31 @@ const NewBoardModal: React.FC<TModalProp> = (props) => {
 
   return (
     <BoardModalMain
-      colors={props.colors}
+      colors={colors}
       show={props.show}
       onHide={props.onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header className={theme.theme.themeBg}>
-        <Modal.Title id="contained-modal-title-vcenter" className={theme.theme.themeTypoDark}>
-          <h2>{props.edit > -1 ? 'Edit Board' : 'Add New Board'}</h2>
+      <Modal.Header className={theme.themeBg}>
+        <Modal.Title id="contained-modal-title-vcenter" className={theme.themeTypoDark}>
+          <h2>{boardEdited ? 'Edit Board' : 'Add New Board'}</h2>
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className={theme.theme.themeBg}>
+      <Modal.Body className={theme.themeBg}>
         <>
           <TextfieldNTM
-            colors={props.colors}
-            title={props.edit > -1 ? 'Board Name' : 'Name'}
+            colors={colors}
+            title={boardEdited ? 'Board Name' : 'Name'}
             placeholder="e.g. Web Design"
             value={title}
             onChange={setTitle}
           />
 
           <MultitaskfieldNTM
-            colors={props.colors}
-            title={props.edit > -1 ? 'Board Columns' : 'Columns'}
+            colors={colors}
+            title={boardEdited ? 'Board Columns' : 'Columns'}
             placeholder={[
               'e.g. Todo',
               'e.g. Tolet',
@@ -99,7 +99,7 @@ const NewBoardModal: React.FC<TModalProp> = (props) => {
           />
 
           <button className="small prim w-100" onClick={AddNewBoard}>
-            {props.edit > -1 ? 'Save Changes' : 'Create New Board'}
+            {boardEdited ? 'Save Changes' : 'Create New Board'}
           </button>
         </>
       </Modal.Body>
@@ -113,15 +113,7 @@ type TNavProp = {
   colors: any;
 };
 
-const DropdownNTM = styled(Dropdown)`
-  margin-bottom: 24px;
-`;
-
 const TextfieldNTM = styled(Textfield)`
-  margin-bottom: 24px;
-`;
-
-const TextareaNTM = styled(Textarea)`
   margin-bottom: 24px;
 `;
 

@@ -2,54 +2,74 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Modal from 'react-bootstrap/Modal';
-import Textfield from './Textfield';
-import Textarea from './Textarea';
-import Multitaskfield from './Multitaskfield';
-import Dropdown from './Dropdown';
-import { useThemeContext } from './ThemeProvider/ThemeProvider';
+import Textfield from '../Textfield';
+import Textarea from '../Textarea';
+import Multitaskfield from '../Multitaskfield';
+import Dropdown from '../Dropdown';
+import { useThemeContext } from '../ThemeProvider/ThemeProvider';
+import { useSelectStatus } from '../SelectStatusProvider/SelectStatusProvider';
+import { IDatabaseBoard } from '../store/taskSlices';
+
+interface TDataProp {
+  boards: {
+    name: string;
+    columns?: {
+      name: string;
+      tasks: TTaskProp[];
+    }[];
+  }[];
+}
+
+interface TTaskProp {
+  title: string;
+  description: string;
+  status: string;
+  subtasks: {
+    title: string;
+    isCompleted: boolean;
+  }[];
+}
 
 interface TModalProp {
-  colors: any;
   show: any;
   onHide: any;
   changeData: any;
-  edit: number[];
   entriesSelect: any;
-  data: any;
+  boards: IDatabaseBoard[];
 }
 
 const NewTaskModal: React.FC<TModalProp> = (props) => {
+  // RETRIEVE DATA / THEME / SELECT STATUS / INTERNAL STATE
+  const { colors, theme } = useThemeContext();
+  const { selectedBoard, selectedCol, editedTask } = useSelectStatus();
+  const taskEdited = editedTask > -1;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [subtasks, setSubtasks] = useState([{ id: '', title: '', isCompleted: 0 }]);
   const [status, setStatus] = useState({ id: props.entriesSelect[0], name: props.entriesSelect[0] }); // number of entriesSelect
-
-  const theme = useThemeContext();
   const debug = 0;
 
-  var subtasksEntries = props.data.boards?.[props.edit[0]]?.columns[props.edit[1]]?.tasks[
-    props.edit[2]
+  // SUBTASK ENTRIES
+  var subtasksEntries = props.boards?.[selectedBoard]?.columns[selectedCol]?.tasks[
+    editedTask
   ]?.subtasks.map((task: any) => {
     return { id: task.id, title: task.title, isCompleted: task.isCompleted };
   });
 
   useEffect(() => {
-    if (debug >= 2) console.log('NewTaskModal/useEffect: ', props.edit, props.entriesSelect, status);
-    if (props.edit[2] > -1) {
-      setTitle(props.data.boards[props.edit[0]].columns[props.edit[1]].tasks[props.edit[2]].title);
-      setDescription(
-        props.data.boards[props.edit[0]].columns[props.edit[1]].tasks[props.edit[2]].description
-      );
+    if (editedTask > -1) {
+      setTitle(props.boards[selectedBoard].columns[selectedCol].tasks[editedTask].title);
+      setDescription(props.boards[selectedBoard].columns[selectedCol].tasks[editedTask].description);
       setSubtasks(subtasksEntries);
       setStatus({
-        id: props.entriesSelect[props.edit[1]]?.id,
-        name: props.data.boards[props.edit[0]].columns[props.edit[1]].name,
+        id: props.entriesSelect[selectedCol]?.id,
+        name: props.boards[selectedBoard].columns[selectedCol].name,
       });
     } else {
       setTitle('');
       setStatus({ id: props.entriesSelect[0]?.id, name: props.entriesSelect[0]?.name });
     }
-  }, [props.edit]); //, props.entriesSelect]);
+  }, [selectedBoard, selectedCol, editedTask]); //, props.entriesSelect]);
 
   const AddNewTask = () => {
     //Validation
@@ -64,9 +84,9 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
         subtasks,
       },
       stateAccess: {
-        selectedBoard: props.edit[0],
-        selectedCol: props.edit[1],
-        selectedTask: props.edit[2],
+        selectedBoard: selectedBoard,
+        selectedCol: selectedCol,
+        selectedTask: editedTask,
         selectedSubtask: null,
       },
     });
@@ -86,9 +106,9 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
         subtasks,
       },
       stateAccess: {
-        selectedBoard: props.edit[0],
-        selectedCol: props.edit[1],
-        selectedTask: props.edit[2],
+        selectedBoard: selectedBoard,
+        selectedCol: selectedCol,
+        selectedTask: editedTask,
         selectedSubtask: null,
       },
     });
@@ -105,36 +125,36 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
   if (debug > 0) console.log('NewTaskModal/render: ', props.entriesSelect, status, subtasks);
   return (
     <TaskModalMain
-      colors={props.colors}
+      colors={colors}
       show={props.show}
       onHide={props.onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header className={theme.theme.themeBg}>
-        <Modal.Title id="contained-modal-title-vcenter" className={theme.theme.themeTypoDark}>
-          <h2>{props.edit[2] > -1 ? 'Edit Task' : 'Add New Task'}</h2>
+      <Modal.Header className={theme.themeBg}>
+        <Modal.Title id="contained-modal-title-vcenter" className={theme.themeTypoDark}>
+          <h2>{taskEdited ? 'Edit Task' : 'Add New Task'}</h2>
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body className={theme.theme.themeBg}>
+      <Modal.Body className={theme.themeBg}>
         <>
           <TextfieldNTM
-            colors={props.colors}
+            colors={colors}
             title="Title"
             placeholder="e.g. Take coffee break"
             value={title}
             onChange={setTitle}
           />
           <TextareaNTM
-            colors={props.colors}
+            colors={colors}
             title="Description"
             placeholder="e.g. It’s always good to take a break. This 15 minute break will recharge the batteries a little."
             value={description}
             onChange={setDescription}
           />
           <MultitaskfieldNTM
-            colors={props.colors}
+            colors={colors}
             title="Subtasks"
             placeholder={[
               'e.g. Take coffee break',
@@ -162,7 +182,6 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
           />
 
           <DropdownNTM
-            colors={props.colors}
             title="Status"
             text={status.name}
             entries={props.entriesSelect}
@@ -170,8 +189,8 @@ const NewTaskModal: React.FC<TModalProp> = (props) => {
               setStatus({ id: props.entriesSelect[val].id, name: props.entriesSelect[val].name })
             }
           />
-          <button className="small prim w-100" onClick={props.edit[2] > -1 ? ChangeTask : AddNewTask}>
-            {props.edit[2] > -1 ? 'Save Changes' : 'Create Task'}
+          <button className="small prim w-100" onClick={editedTask > -1 ? ChangeTask : AddNewTask}>
+            {editedTask > -1 ? 'Save Changes' : 'Create Task'}
           </button>
         </>
       </Modal.Body>

@@ -1,18 +1,23 @@
 import React, { useState, useContext } from 'react';
 import light from './light.module.css';
 import dark from './dark.module.css';
+import { colors } from './colors';
 
 // Define ThemeContext
 type TThemeContext = {
   theme: any;
   toggleTheme: () => void;
   status: string;
+  colors: any;
 };
+
 const defaultValue = {
   theme: {},
   toggleTheme: () => {},
   status: 'light',
+  colors: {},
 };
+
 export const ThemeContext = React.createContext<TThemeContext>(defaultValue);
 
 // Define Theme Provider
@@ -31,6 +36,7 @@ export const ThemeProvider: React.FC<TThemeProvider> = ({ children }) => {
     theme: theme === 'light' ? light : dark,
     toggleTheme,
     status: theme === 'light' ? 'light' : 'dark',
+    colors: colors,
   };
 
   //console.log('themeprovider: ', providerValue, light, dark);

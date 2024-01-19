@@ -5,59 +5,52 @@ import ToggleDarkModus from './ToggleDarkModus';
 import { ReactComponent as SidebarIcon } from './images/icon-board.svg';
 import { ReactComponent as HideIcon } from './images/icon-hide-sidebar.svg';
 import { useThemeContext } from './ThemeProvider/ThemeProvider';
+import { useSelectStatus } from './SelectStatusProvider/SelectStatusProvider';
+import { useAppSelector } from './store/hooks';
+import { useModalStatus } from './ModalStatusProvider/ModalStatusProvider';
 
 interface TProps {
   className?: string;
-  colors: any;
-  sidebarCollapse: boolean;
-  data: any;
-  selectedBoard: number;
-  selectBoard: any;
-  setEditedBoard: any;
-  setNewBoardModalShow: any;
-  ToggleSidebarCollapse: any;
+  sidebarCollapse?: boolean;
+  toggleSidebarCollapse?: any;
 }
 
-const Sidebar: React.FC<TProps> = ({
-  className,
-  colors,
-  sidebarCollapse,
-  data,
-  selectedBoard,
-  selectBoard,
-  setEditedBoard,
-  setNewBoardModalShow,
-  ToggleSidebarCollapse,
-}) => {
-  const theme = useThemeContext();
+const Sidebar: React.FC<TProps> = ({ className, sidebarCollapse = false, toggleSidebarCollapse }) => {
+  const { theme, colors, toggleTheme } = useThemeContext();
+  const boards = useAppSelector((state) => state.taskData.boards);
+  const { selectedBoard, setSelectedBoard, setEditedBoard } = useSelectStatus();
+  const { setNewBoardModalShow } = useModalStatus();
+  const debug = 2;
+
+  if (debug > 1) console.log('Sidebar/beforeRender: ', boards, selectedBoard);
 
   return (
     <SidebarMain
       className={
         sidebarCollapse
           ? `${className} sidebar collapsed d-flex flex-column justify-content-between ` +
-            theme.theme.themeBg +
+            theme.themeBg +
             ' ' +
-            theme.theme.themeBorder
+            theme.themeBorder
           : `${className} sidebar d-flex flex-column justify-content-between ` +
-            theme.theme.themeBg +
+            theme.themeBg +
             ' ' +
-            theme.theme.themeBorder
+            theme.themeBorder
       }
       colors={colors}
       pointer={pointer}
     >
       <div className="upper d-flex flex-column h-100">
-        <h3 className={'sidebar-heading '}>ALL BOARDS ({data.boards?.length})</h3>
-        {data.boards?.map((item: any, i: any) => {
+        <h3 className={'sidebar-heading '}>ALL BOARDS ({boards?.length})</h3>
+        {boards?.map((item: any, i: any) => {
           return (
             <div
               className={
                 selectedBoard === i
                   ? 'nav-item d-flex flex-row align-items-center active '
-                  : 'nav-item d-flex flex-row align-items-center ' + theme.theme.themeHoverLight
+                  : 'nav-item d-flex flex-row align-items-center ' + theme.themeHoverLight
               }
-              onClick={() => selectBoard(i)}
+              onClick={() => setSelectedBoard(i)}
               key={i}
             >
               <SidebarIcon />
@@ -75,12 +68,12 @@ const Sidebar: React.FC<TProps> = ({
           <SidebarIcon />
           <h3>+ Create New Board</h3>
         </div>
-        {1 && (
+        {!sidebarCollapse && (
           <ToggleDarkModus
-            className={'toggle-dark-modus ' + theme.theme.themeBgDark2}
+            className={'toggle-dark-modus ' + theme.themeBgDark2}
             colors={colors}
             onChange={(e: any) => {
-              theme.toggleTheme();
+              toggleTheme();
             }}
           />
         )}
@@ -92,7 +85,7 @@ const Sidebar: React.FC<TProps> = ({
               ? 'nav-item marker collapsed d-flex flex-row align-items-center'
               : 'nav-item marker d-flex flex-row align-items-center'
           }
-          onClick={ToggleSidebarCollapse}
+          onClick={toggleSidebarCollapse}
         >
           <HideIcon />
           {!sidebarCollapse && <h3>HideSidebar</h3>}
@@ -114,7 +107,8 @@ type TPointerProp = {
 };
 
 const SidebarMain = styled.div<TColorProp & TPointerProp>`
-  width: 300px;
+  width: 100%;
+  height: 100%;
   padding-bottom: 80px;
   border-right: 1px solid white;
 
@@ -136,8 +130,6 @@ const SidebarMain = styled.div<TColorProp & TPointerProp>`
     cursor: url('${({ pointer }) => pointer}'), pointer;
 
     &:hover {
-      //background-color: ${({ colors, darkModus }) =>
-        darkModus ? colors.white : colors.main_purple10};
       color: ${({ colors }) => colors.main_purple};
 
       svg path {

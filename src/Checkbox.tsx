@@ -5,15 +5,14 @@ import pointer from './images/pointer.png';
 import { useThemeContext } from './ThemeProvider/ThemeProvider';
 
 interface TProps {
-  colors: any;
   text: string;
   checked: boolean;
   onChange: (option: boolean) => void;
 }
 
-const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
+const Checkbox: React.FC<TProps> = ({ text, checked, onChange }) => {
   const [boxChecked, setBoxChecked] = useState(checked);
-  const theme = useThemeContext();
+  const { theme, colors } = useThemeContext();
 
   const toggleBoxChecked = () => {
     boxChecked ? setBoxChecked(false) : setBoxChecked(true);
@@ -24,7 +23,7 @@ const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
     <CheckboxMain
       colors={colors}
       pointer={pointer}
-      className={'d-flex flex-row justify-content-start align-items-center ' + theme.theme.themeBgDark2}
+      className={'d-flex flex-row justify-content-start align-items-center ' + theme.themeBgDark2}
       onClick={() => toggleBoxChecked()}
     >
       <input
@@ -35,11 +34,7 @@ const Checkbox: React.FC<TProps> = ({ colors, text, checked, onChange }) => {
         onChange={() => toggleBoxChecked()}
       />
       <p
-        className={
-          boxChecked
-            ? theme.theme.themeTypoDark50 + ' bold checked'
-            : theme.theme.themeTypoDark + ' bold'
-        }
+        className={boxChecked ? theme.themeTypoDark50 + ' bold checked' : theme.themeTypoDark + ' bold'}
       >
         {text}
       </p>
@@ -80,11 +75,9 @@ const CheckboxMain = styled.div<TNavProp>`
     font-size: 12px;
     font-weight: 700;
     line-height: 15px;
-    //color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.black)} !important;
     margin: 0px 0px 0px 16px;
 
     &.checked {
-      //color: ${({ colors, darkModus }) => (darkModus ? colors.white50 : colors.black50)} !important;
       text-decoration: line-through;
     }
   }

@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-amplify665768e2e9324-staging-204206-authRole",
+      "UnauthRoleArn": "arn:aws:iam::767397723404:role/amplify-amplify665768e2e9324-staging-204206-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::767397723404:role/amplify-amplify665768e2e9324-staging-204206-authRole",
+      "Region": "eu-central-1",
+      "DeploymentBucketName": "amplify-amplify665768e2e9324-staging-204206-deployment",
+      "UnauthRoleName": "amplify-amplify665768e2e9324-staging-204206-unauthRole",
+      "StackName": "amplify-amplify665768e2e9324-staging-204206",
+      "StackId": "arn:aws:cloudformation:eu-central-1:767397723404:stack/amplify-amplify665768e2e9324-staging-204206/38c661a0-ad9d-11ee-8db9-0ae6e9aebc39",
+      "AmplifyAppId": "d32i6ftzcx1dml"
+    },
+    "categories": {
+      "auth": {
+        "kanbantaskmanagementd9cd091b": {}
+      }
+    }
+  }
+}

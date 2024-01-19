@@ -7,7 +7,6 @@ import { stat } from 'fs';
 
 interface TProps {
   className?: string;
-  colors: any;
   title?: string;
   text: string | undefined;
   entries: any;
@@ -16,9 +15,9 @@ interface TProps {
 
 const debug = 0;
 
-const Dropdown: React.FC<TProps> = ({ className, colors, title, text, entries, changeDropdown }) => {
+const Dropdown: React.FC<TProps> = ({ className, title, text, entries, changeDropdown }) => {
   const [boxChecked, setBoxChecked] = useState(false);
-  const theme = useThemeContext();
+  const { theme, colors } = useThemeContext();
 
   let defVal;
 
@@ -37,13 +36,13 @@ const Dropdown: React.FC<TProps> = ({ className, colors, title, text, entries, c
       pointer={pointer}
       className={className + ' d-flex flex-column justify-content-start align-items-start'}
     >
-      <label className={theme.theme.themeTypoGrey} htmlFor="dropdown">
+      <label className={theme.themeTypoGrey} htmlFor="dropdown">
         {title}
       </label>
 
       <select
         id="dropdown"
-        className={theme.theme.themeBg + ' ' + theme.theme.themeTypoDark}
+        className={theme.themeBg + ' ' + theme.themeTypoDark}
         name="Dropdown"
         value={defVal}
         onChange={(e) => selectDropdown(e.target.value)}
@@ -64,7 +63,6 @@ export default Dropdown;
 
 type TColorProp = {
   colors: any;
-  darkModus?: any;
 };
 
 type TPointerProp = {

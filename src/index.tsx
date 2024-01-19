@@ -1,21 +1,30 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from './ThemeProvider/ThemeProvider';
+import { SelectStatusProvider } from './SelectStatusProvider/SelectStatusProvider';
+import { ModalStatusProvider } from './ModalStatusProvider/ModalStatusProvider';
 import { store } from './store/store';
 import { ToastContainer } from 'react-toastify';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { Amplify } from 'aws-amplify';
+import config from './aws-exports';
+Amplify.configure(config);
+
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <Provider store={store}>
     <ThemeProvider>
-      <ToastContainer />
-      <App />
+      <SelectStatusProvider>
+        <ModalStatusProvider>
+          <ToastContainer />
+          <App />
+        </ModalStatusProvider>
+      </SelectStatusProvider>
     </ThemeProvider>
   </Provider>
 );

@@ -79,6 +79,7 @@ type IPayloadDeleteBoard = {
 };
 
 interface IPayloadError {
+  
   error: any;
 }
 

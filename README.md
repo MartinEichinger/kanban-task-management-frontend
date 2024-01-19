@@ -72,10 +72,16 @@ Then crop/optimize/edit your image however you like, add it to your project, and
 I used this challenge also to try out some design patterns.
 
 ```html
-### Provider Pattern
+PROVIDER PATTERN
 ```
 
 I used this pattern to share the theme UI state (colors, dark modus) with all relevant components and also used it for further UI related states. It would've been also possible to use the redux store for that issue, but I wanted to use redux only for state management related to the database communication/ data exchange.
+
+```html
+LAYOUT PATTERN
+```
+
+With the layout pattern I separated the layout and sizes of the split screen from the single components like nav, content, sidebar.
 
 ### Continued development
 

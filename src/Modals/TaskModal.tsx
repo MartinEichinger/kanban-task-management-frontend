@@ -5,71 +5,43 @@ import produce from 'immer';
 
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import Checkbox from './Checkbox';
-import Dropdown from './Dropdown';
-import { ReactComponent as Ellipsis } from './images/icon-vertical-ellipsis.svg';
-import pointer from './images/pointer.png';
+import Checkbox from '../Checkbox';
+import Dropdown from '../Dropdown';
+import { ReactComponent as Ellipsis } from '../images/icon-vertical-ellipsis.svg';
+import pointer from '../images/pointer.png';
 
-import { updateTask } from './store/taskSlices';
-import { useAppSelector, useAppDispatch } from './store/hooks';
-import { useThemeContext } from './ThemeProvider/ThemeProvider';
-
-interface TDataProp {
-  boards: {
-    name: string;
-    columns?: {
-      name: string;
-      tasks: TTaskProp[];
-    }[];
-  }[];
-}
-
-interface TTaskProp {
-  title: string;
-  description: string;
-  status: string;
-  subtasks: {
-    title: string;
-    isCompleted: boolean;
-  }[];
-}
-
-interface TSelectionProp {
-  selectedBoard: number;
-  selectedCol: number;
-  selectedTask: number;
-}
+import { updateTask, IDatabaseBoard } from '../store/taskSlices';
+import { useAppDispatch } from '../store/hooks';
+import { useThemeContext } from '../ThemeProvider/ThemeProvider';
+import { useSelectStatus } from '../SelectStatusProvider/SelectStatusProvider';
 
 interface TModalProp {
-  colors: any;
   show: any;
   onHide: any;
-  boards: TDataProp;
-  selection: TSelectionProp;
+  boards: IDatabaseBoard[];
   handleMenuSelection: any;
   changeData: any;
 }
 
 const TaskModal: React.FC<TModalProp> = (props) => {
-  var { selectedBoard, selectedCol, selectedTask } = props.selection;
-  var board = selectedBoard > -1 ? (props as any).boards?.[selectedBoard] : undefined;
-  var col = selectedBoard > -1 && selectedCol > -1 ? board?.columns?.[selectedCol] : undefined;
-  var task =
-    selectedBoard > -1 && selectedCol > -1 && selectedTask > -1 ? col?.tasks?.[selectedTask] : undefined;
+  // RETRIEVE DATA
+  const { colors, theme } = useThemeContext();
+  const { selectedBoard, selectedCol, selectedTask } = useSelectStatus();
+  const boardSelected = selectedBoard > -1;
+  const colSelected = selectedCol > -1;
+  const taskSelected = selectedTask > -1;
+  console.log(boardSelected, colSelected, taskSelected);
 
-  const debug = 0;
+  const board = boardSelected ? props.boards?.[selectedBoard] : undefined;
+  const col = boardSelected && colSelected ? board?.columns?.[selectedCol] : undefined;
+  const task = boardSelected && colSelected && taskSelected ? col?.tasks?.[selectedTask] : undefined;
+  console.log(board, col, task);
+
+  const debug = 2;
   const dispatch = useAppDispatch();
-
   const [showMenu, setShowMenu] = useState(false);
-  const theme = useThemeContext();
 
-  if (debug >= 1) console.log('CustomModal ', props, selectedBoard, selectedCol, selectedTask);
-  if (debug >= 2 && selectedBoard > -1 && selectedCol > -1 && selectedTask > -1) {
-    console.log('CustomModal/Board ', selectedBoard);
-    console.log('CustomModal/Col: ', selectedCol);
-    console.log('CustomModal/Task: ', selectedTask);
-  }
-
+  // METHODS
   const onClickMenu = (sel: string) => {
     setShowMenu(false);
     if (sel === 'edit') {
@@ -79,32 +51,45 @@ const TaskModal: React.FC<TModalProp> = (props) => {
     }
   };
 
-  if (debug > 0) console.log('TaskModal/beforeRender: ', board, props, task);
+  if (debug > 0)
+    console.log(
+      'TaskModal/beforeRender: ',
+      props,
+      board,
+      col,
+      task,
+      selectedBoard,
+      selectedCol,
+      selectedTask,
+      boardSelected,
+      colSelected,
+      taskSelected
+    );
   return (
     <TaskModalMain
-      colors={props.colors}
+      colors={colors}
       show={props.show}
       onHide={props.onHide}
       size="lg"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header className={theme.theme.themeBg}>
-        <Modal.Title id="contained-modal-title-vcenter" className={theme.theme.themeTypoDark}>
+      <Modal.Header className={theme.themeBg}>
+        <Modal.Title id="contained-modal-title-vcenter" className={theme.themeTypoDark}>
           <h2>{selectedBoard > -1 && selectedCol > -1 && selectedTask > -1 && `${task?.title}`}</h2>
         </Modal.Title>
         <EllipsisBody
-          className={theme.theme.themeHoverDark}
+          className={theme.themeHoverDark}
           pointer={pointer}
-          colors={props.colors}
+          colors={colors}
           onClick={() => setShowMenu(!showMenu)}
         >
           <Ellipsis />
         </EllipsisBody>
       </Modal.Header>
       <ModalMenu
-        className={theme.theme.themeBgDark + ' ' + theme.theme.themePHoverDark}
-        colors={props.colors}
+        className={theme.themeBgDark + ' ' + theme.themePHoverDark}
+        colors={colors}
         pointer={pointer}
         showMenu={showMenu}
       >
@@ -113,7 +98,7 @@ const TaskModal: React.FC<TModalProp> = (props) => {
           Delete Task
         </p>
       </ModalMenu>
-      <Modal.Body className={theme.theme.themeBg}>
+      <Modal.Body className={theme.themeBg}>
         <>
           <p>{task?.description}</p>
           <p className="bold">Subtasks({task?.subtasks.length})</p>
@@ -122,7 +107,6 @@ const TaskModal: React.FC<TModalProp> = (props) => {
               return (
                 <div className="subtask" key={i}>
                   <Checkbox
-                    colors={props.colors}
                     text={subtask.title}
                     checked={subtask.isCompleted}
                     onChange={(val: any) => {
@@ -153,7 +137,6 @@ const TaskModal: React.FC<TModalProp> = (props) => {
             })}
           </div>
           <Dropdown
-            colors={props.colors}
             title="Current Status"
             text={task?.status.name}
             entries={board?.columns}
@@ -166,11 +149,11 @@ const TaskModal: React.FC<TModalProp> = (props) => {
                   selectedSubtask: -1,
                 },
                 task: {
-                  id: task.id,
-                  title: task.title,
-                  description: task.description,
-                  status: { id: board.columns[val].id, name: board.columns[val].name },
-                  subtasks: task.subtasks,
+                  id: task?.id,
+                  title: task?.title,
+                  description: task?.description,
+                  status: { id: board?.columns[val as any].id, name: board?.columns[val as any].name },
+                  subtasks: task?.subtasks,
                 },
               });
             }}
@@ -249,10 +232,6 @@ const TaskModalMain = styled(Modal)<TNavProp>`
   .modal-body {
     border-bottom-left-radius: var(--bs-modal-inner-border-radius);
     border-bottom-right-radius: var(--bs-modal-inner-border-radius);
-
-    .bold {
-      //color: ${({ colors, darkModus }) => (darkModus ? colors.white : colors.medium_grey)};
-    }
   }
 
   p {
